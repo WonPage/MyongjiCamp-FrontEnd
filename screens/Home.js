@@ -1,16 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native';
-const Home = () => {
+import { StyleSheet, Text, View, Button } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+export default function Home({navigation}) {
     return(
-            <Text style={styles.container}>짱이다!!</Text>
+      <View style={styles.container}>
+        <Text style={styles.text}>안녕하s세요!!!</Text>
+        <Button title='로그인창으로' onPress={() => navigation.navigate('Login')}/>
+      </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#fff000',
       alignItems: 'center',
       justifyContent: 'center',
-    }
-});  
-
-export default Home;
+    },
+    text: {
+      fontSize: 28,
+    },
+}); 
