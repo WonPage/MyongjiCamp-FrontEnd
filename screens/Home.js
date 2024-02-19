@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 const Home = () => {
     return(
-            <Text style={styles.container}>안녕하세요</Text>
+            <Text style={styles.container}>짱이다!!</Text>
     );
 }
 const styles = StyleSheet.create({
