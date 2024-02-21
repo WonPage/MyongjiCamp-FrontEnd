@@ -1,10 +1,15 @@
-import { Dimensions,View } from 'react-native';
+import {View,Text,StyleSheet } from 'react-native';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('winow');
 export default function App() {
   return (
-      <View>
-
-      </View>
+    <View style={styles.container}>
+    <Text style={styles.text}>하이안녕하세요</Text>
+  </View>
   );
 }
+const styles = StyleSheet.create({
+  container:{
+    flex: 1,
+    justifyContent: 'center',
+  },
+})
