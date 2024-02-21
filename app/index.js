@@ -5,8 +5,8 @@ export default function Home(){
     return (
         <View>
             <Text>Hello World!!!!</Text>
-            <Link href={'/screens/login'}>로그인 화면으로 이동</Link>
-            <Link href={'/screens/signup'}>회원가입 화면으로 이동</Link>
+            <Link style={styles.text} href={'/screens/login'}>로그인 화면으로 이동</Link>
+            <Link style={styles.text} href={'/screens/signup'}>회원가입 화면으로 이동</Link>
         </View>
     )
 }
