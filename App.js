@@ -1,11 +1,16 @@
-import { Dimensions } from 'react-native';
-import { router } from 'expo-router';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StatusBar } from 'expo-status-bar';
+import Home from './screens/Home';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('winow');
+const Stack = createNativeStackNavigator();
 export default function App() {
   return (
-      <View>
-
-      </View>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={Home}/>
+        </Stack.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
   );
 }

@@ -12,4 +12,4 @@ const styles = StyleSheet.create({
     },
     text: {
     },
-}); 
+});
