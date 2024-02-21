@@ -1,8 +1,13 @@
-import { Text, StyleSheet } from "react-native";
+import { Link } from "expo-router";
+import { Text, StyleSheet, View } from "react-native";
 
 export default function Home(){
     return (
-        <Text>Hello World!</Text>
+        <View>
+            <Text>Hello World!</Text>
+            <Link href={'/screens/login'}>로그인 화면으로 이동</Link>
+            <Link href={'/screens/signup'}>회원가입 화면으로 이동</Link>
+        </View>
     )
 }
 
