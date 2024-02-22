@@ -4,12 +4,6 @@ import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, T
 
 const Stack = createNativeStackNavigator();
 
-export default function Signup() {
-    return (
-        <View></View>
-    )
-}
-
 export function Step1Screen({navigation}) {
     const inputRef = useRef();
 
@@ -17,7 +11,6 @@ export function Step1Screen({navigation}) {
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [isCodeSent, SetIsCodeSent] = useState(false);
-    const [step, setStep] = useState(0);
 
     const handleTextClick = () => {
         inputRef.current.focus();
@@ -29,7 +22,11 @@ export function Step1Screen({navigation}) {
         if (!regex.test(email)) { // 한글, 특수문자 방지
             return Alert.alert('경고', '영문, 숫자만 입력 가능합니다.')
         }
+        // **백엔드** 인증코드 보내기
+        //성공 시
         SetIsCodeSent(true);
+        //실패 시
+        //return Alert.alert('오류', '전송에 실패하였습니다.');
     }
     const handleResendCode = () => {
         //이메일 인증번호 재전송 코드
@@ -75,18 +72,75 @@ export function Step1Screen({navigation}) {
         </View>
     )
 }
-export function Step2Screen({ navigation }) {
+export function Step2Screen({ navigation }) {    
+    const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
+
+    const [password, setPassword] = useState('');
+    const [passwordCheck, setPasswordCheck] = useState('');
+    const handlePasswordCheck = () => {
+        if (password.length === 0) {
+            return Alert.alert('경고', '비밀번호를 입력해주세요.');
+        } else if (!passwordRegExp.test(password)) {
+            return Alert.alert('경고', '안전하지 않은 비밀번호입니다.')
+        } else if (passwordCheck.length === 0) {
+            return Alert.alert('경고', '비밀번호 재입력을 입력해주세요.')
+        } else if (password !== passwordCheck) {
+            return Alert.alert('경고', '동일한 비밀번호를 입력해주세요.')
+        }
+        // 모든 검증을 마쳤으면 비밀번호를 저장 (**백엔드**) 하고 다음단계로 이동.
+        navigation.navigate('Step3');
+    }
     return (
-        <View>
+        <View style={styles.container}>
+            <Image
+                style={styles.myongji_icon}
+                source={require('../../assets/myongji-icon.png')} />
+            <Text>안전한 비밀번호를 만들어주세요.</Text>
+            <TextInput style={styles.password_box}
+            placeholder="비밀번호 입력"
+            onChangeText={setPassword} />
+            <TextInput style={styles.password_box}
+            placeholder="비밀번호 재입력"
+            onChangeText={setPasswordCheck}/>
             <Pressable
-                onPress={()=>{navigation.navigate('Step3')}}><Text>인증 보내기</Text>
+                onPress={handlePasswordCheck}><Text>확인</Text>
             </Pressable>
         </View>
     )
 }
 export function Step3Screen() {
+    const handleNicknameCheck = () => {
+        // **백엔드** 닉네임 DB에 중복확인
+        // 중복 시
+        // return Alert.alert('경고', '이미 존재하는 닉네임입니다.');
+        // 중복 안하면
+        // 사용가능한 닉네임입니다. 하면서 닉네임 변경하지 않는 한 비활성화처리.
+    }
+    const handleSignupComplete = () => {
+        // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
+        // 중복확인이 false 상태면 '닉네임 중복검사를 해주세요.' 라는 Alert 띄움.
+    }
     return (
-        <View><Text>안녕하신가3</Text></View>
+        <View style={styles.container}>
+            <Image
+                style={styles.myongji_icon}
+                source={require('../../assets/myongji-icon.png')} />
+            <View style={styles.nickname_box}>
+                <TextInput
+                    style={styles.nickname_input}
+                    placeholder="닉네임" />
+                <Pressable
+                    style={styles.nickname_check}
+                    onPress={handleNicknameCheck}>
+                    <Text>중복확인</Text>
+                </Pressable>
+            </View>
+            <Pressable
+            style={styles.signup_button}
+            onPress={handleSignupComplete}>
+                <Text>회원가입 완료</Text>
+            </Pressable>
+        </View>
     )
 }
 
@@ -119,5 +173,19 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         backgroundColor: "skyblue",
         marginTop: 20,
+    },
+    password_box: {
+        borderWidth: 1,
+    },
+    nickname_box: {
+        flexDirection: 'row',
+        borderWidth: 1,
+    },
+    nickname_check: {
+        margin: 5,
+        backgroundColor: "skyblue",
+    },
+    signup_button: {
+        backgroundColor: "yellow"
     }
 });
