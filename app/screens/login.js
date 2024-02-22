@@ -1,12 +1,13 @@
 import {useState} from 'react';
 import { Link } from "expo-router";
 
-import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image } from "react-native";
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image,Switch } from "react-native";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 export default function Login(){
     const [emailPrefix, setEmailPrefix] = useState('');
     const [password, setPassword] = useState('');
+    const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
     return (
         <KeyboardAvoidingView 
@@ -18,26 +19,45 @@ export default function Login(){
             source={require('../../assets/myongji-icon.png')}/>
             </View>
             <View style ={styles.input}>
-                <TextInput 
-                style={styles.input_email}
-                placeholder="이메일"
-                value={emailPrefix}
-                onChangeText={setEmailPrefix}
-                autoCapitalize='none'
-                maxLength={30} // 최대 글자 수 30자
-                />
-                <Text>@mju.ac.kr</Text>
+                <View style = {styles.input_box}>
+                    <TextInput 
+                    style={styles.input_email_txt}
+                    placeholder="이메일"
+                    value={emailPrefix}
+                    onChangeText={setEmailPrefix}
+                    autoCapitalize='none'
+                    maxLength={20} // @앞의 최대 글자 수 30자
+                    />
+                    <Text style={styles.input_email_rear}>@mju.ac.kr</Text>
+                </View>
                 <TextInput
+                style={styles.input_password}
                 placeholder="비밀번호"
                 value={password}
                 secureTextEntry
                 onChangeText={setPassword}
                 autoCapitalize='none'
-                maxLength={30} // 최대 글자 수 30자
+                maxLength={20} // 최대 글자 수 30자
                 />
             </View>
-            <View style={styles.checkBox}></View>
-            <View style={styles.confirm}></View>
+            <View style={styles.checkBox_container}>
+                <View style={styles.checkBox}>
+                    <View style={styles.ex}>
+                    <BouncyCheckbox
+                    size={20}
+                    textStyle={{
+                        textDecorationLine : "none"
+                    }}
+                    text="로그인 유지"
+                    />
+                    </View>
+                </View>
+            </View>
+            <View style={styles.confirm}>
+                <Button
+                title = "로그인"
+                />
+            </View>
             <View style={styles.cant}></View>
             <View style={styles.app_tour}></View>
         </KeyboardAvoidingView>
@@ -46,11 +66,9 @@ export default function Login(){
 const styles = StyleSheet.create({
     container : {
         flex : 1,
-        backgroundColor : 'red',
     },
     icon : {
         flex : 3,
-        backgroundColor : 'red',
         justifyContent: 'center',
         alignItems: 'center'
     },
@@ -59,15 +77,49 @@ const styles = StyleSheet.create({
         width: 100
     },
     input : {
-        flex : 2,
-        backgroundColor : 'green'
+        flex : 2.5,
+        justifyContent : 'space-around',
+        alignItems : 'center',
+    },
+    input_box : {
+        flexDirection: 'row', 
+        alignItems: 'center',
+        justifyContent:'space-around',
+        borderWidth: 1,
+        width : '60%',
+        height : 40,
+        marginVertical : 10,
+        borderRadius:15,
+        paddingHorizontal : 10,
+    },
+    input_email_txt : {
+        fontSize : 15,
+        width : '60%',
+    },
+    input_email_rear : {
+        fontSize : 15,
+        color : 'gray',
+        width : '40%',
+    },
+    input_password : {
+        borderWidth: 1,
+        width : '60%',
+        alignItems : 'center',
+        height : 40,
+        borderRadius:15,
+        paddingHorizontal : 10,
+        fontSize : 15
+    },
+    checkBox_container : {
+        flex : 0.5,
     },
     checkBox : {
-        flex : 0.5,
-        backgroundColor : 'white'
+        width:"60%",
+        backgroundColor : "white"
     },
     confirm : {
         flex : 1.5,
+        width: "60%",
         backgroundColor : 'red'
     },
     cant : {
