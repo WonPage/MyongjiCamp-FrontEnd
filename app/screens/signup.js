@@ -6,15 +6,11 @@ const Stack = createNativeStackNavigator();
 
 export default function Signup() {
     return (
-        <Stack.Navigator initialRouteName="step1">
-            <Stack.Screen name="Step1" component={Step1Screen} />
-            <Stack.Screen name="Step2" component={Step2Screen} />
-            <Stack.Screen name="Step3" component={Step3Screen} />
-        </Stack.Navigator>         
+        <View></View>
     )
 }
 
-function Step1Screen({navigation}) {
+export function Step1Screen({navigation}) {
     const inputRef = useRef();
 
     const regex = /^[a-zA-Z0-9]+$/
@@ -79,7 +75,7 @@ function Step1Screen({navigation}) {
         </View>
     )
 }
-function Step2Screen({ navigation }) {
+export function Step2Screen({ navigation }) {
     return (
         <View>
             <Pressable
@@ -88,7 +84,7 @@ function Step2Screen({ navigation }) {
         </View>
     )
 }
-function Step3Screen() {
+export function Step3Screen() {
     return (
         <View><Text>안녕하신가3</Text></View>
     )
