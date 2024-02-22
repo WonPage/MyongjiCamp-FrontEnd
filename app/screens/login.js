@@ -1,41 +1,76 @@
+import {useState} from 'react';
 import { Link } from "expo-router";
-import {  StyleSheet, View } from "react-native";
+
+import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image } from "react-native";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 export default function Login(){
+    const [emailPrefix, setEmailPrefix] = useState('');
+    const [password, setPassword] = useState('');
+
     return (
-        <View style ={styles.container}>
-            <View style ={styles.icon}></View>
-            <View style ={styles.login_input}></View>
-            <View style={styles.login_checkBox}></View>
-            <View style={styles.login_confirm}></View>
-            <View style={styles.login_cant}></View>
+        <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style ={styles.container}>
+            <View style ={styles.icon}>
+            <Image 
+            style={styles.myongji_icon}
+            source={require('../../assets/myongji-icon.png')}/>
+            </View>
+            <View style ={styles.input}>
+                <TextInput 
+                style={styles.input_email}
+                placeholder="이메일"
+                value={emailPrefix}
+                onChangeText={setEmailPrefix}
+                autoCapitalize='none'
+                maxLength={30} // 최대 글자 수 30자
+                />
+                <Text>@mju.ac.kr</Text>
+                <TextInput
+                placeholder="비밀번호"
+                value={password}
+                secureTextEntry
+                onChangeText={setPassword}
+                autoCapitalize='none'
+                maxLength={30} // 최대 글자 수 30자
+                />
+            </View>
+            <View style={styles.checkBox}></View>
+            <View style={styles.confirm}></View>
+            <View style={styles.cant}></View>
             <View style={styles.app_tour}></View>
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 const styles = StyleSheet.create({
     container : {
         flex : 1,
-
-        backgroundColor : 'red'
+        backgroundColor : 'red',
     },
     icon : {
         flex : 3,
-        backgroundColor : 'red'
+        backgroundColor : 'red',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    login_input : {
+    myongji_icon : {
+        height: 100,
+        width: 100
+    },
+    input : {
         flex : 2,
         backgroundColor : 'green'
     },
-    login_checkBox : {
+    checkBox : {
         flex : 0.5,
         backgroundColor : 'white'
     },
-    login_confirm : {
+    confirm : {
         flex : 1.5,
         backgroundColor : 'red'
     },
-    login_cant : {
+    cant : {
         flex : 0.5,
         backgroundColor : 'green'
     },
