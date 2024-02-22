@@ -3,8 +3,10 @@ import { Link } from "expo-router";
 
 import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image,Switch } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+// 드래그 & ctrl alt l -> 자동 정렬
+// navigation.navigate('Step1'); -> 회원가입 
 
-export default function Login(){
+export default function Login({navigation}){
     const [emailPrefix, setEmailPrefix] = useState('');
     const [password, setPassword] = useState('');
     const [stayLoggedIn, setStayLoggedIn] = useState(false);
@@ -13,6 +15,7 @@ export default function Login(){
         <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style ={styles.container}>
+            <View style = {styles.con}>
             <View style ={styles.icon}>
             <Image 
             style={styles.myongji_icon}
@@ -53,19 +56,31 @@ export default function Login(){
                     </View>
                 </View>
             </View>
-            <View style={styles.confirm}>
+            <View style={styles.confirm_container}>
                 <Button
+                style = {styles.confirm}
                 title = "로그인"
                 />
             </View>
-            <View style={styles.cant}></View>
+            <View style={styles.cant}>
+                <Button
+                title = "회원가입"
+                onPress={()=>navigation.navigate('Step1')}
+                />
+            </View>
             <View style={styles.app_tour}></View>
+            </View>
         </KeyboardAvoidingView>
     );
 }
 const styles = StyleSheet.create({
     container : {
         flex : 1,
+        alignItems:"center",
+    },
+    con : {
+        flex:1,
+        width : "80%",
     },
     icon : {
         flex : 3,
@@ -78,15 +93,12 @@ const styles = StyleSheet.create({
     },
     input : {
         flex : 2.5,
-        justifyContent : 'space-around',
-        alignItems : 'center',
     },
     input_box : {
         flexDirection: 'row', 
         alignItems: 'center',
         justifyContent:'space-around',
         borderWidth: 1,
-        width : '60%',
         height : 40,
         marginVertical : 10,
         borderRadius:15,
@@ -94,7 +106,6 @@ const styles = StyleSheet.create({
     },
     input_email_txt : {
         fontSize : 15,
-        width : '60%',
     },
     input_email_rear : {
         fontSize : 15,
@@ -103,7 +114,6 @@ const styles = StyleSheet.create({
     },
     input_password : {
         borderWidth: 1,
-        width : '60%',
         alignItems : 'center',
         height : 40,
         borderRadius:15,
@@ -114,13 +124,16 @@ const styles = StyleSheet.create({
         flex : 0.5,
     },
     checkBox : {
-        width:"60%",
-        backgroundColor : "white"
+        borderRadius : 20,
+
     },
-    confirm : {
+    confirm_container : {
         flex : 1.5,
-        width: "60%",
         backgroundColor : 'red'
+    },
+    confirm:{
+        backgroundColor:"#1e90ff",
+        borderRadius : 20
     },
     cant : {
         flex : 0.5,
