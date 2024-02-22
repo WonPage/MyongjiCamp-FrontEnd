@@ -33,7 +33,9 @@ export function Step1Screen({navigation}) {
     }
     const handleVerifyCode = () => {
         //인증번호 인증하기 버튼
-        navigation.navigate('Step2');
+        navigation.navigate('Step2', {
+            email: email, 
+        });
     }
     return (
         <View style={styles.container}>
@@ -72,9 +74,10 @@ export function Step1Screen({navigation}) {
         </View>
     )
 }
-export function Step2Screen({ navigation }) {    
-    const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
+export function Step2Screen({ route, navigation }) {    
+    const { email } = route.params;
 
+    const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
     const [password, setPassword] = useState('');
     const [passwordCheck, setPasswordCheck] = useState('');
     const handlePasswordCheck = () => {
@@ -88,7 +91,10 @@ export function Step2Screen({ navigation }) {
             return Alert.alert('경고', '동일한 비밀번호를 입력해주세요.')
         }
         // 모든 검증을 마쳤으면 비밀번호를 저장 (**백엔드**) 하고 다음단계로 이동.
-        navigation.navigate('Step3');
+        navigation.navigate('Step3', {
+            email : email,
+            password : password,
+        });
     }
     return (
         <View style={styles.container}>
@@ -108,7 +114,11 @@ export function Step2Screen({ navigation }) {
         </View>
     )
 }
-export function Step3Screen() {
+export function Step3Screen({route, navigation}) {
+    const { email, password } = route.params;
+
+    const [ nickname, setNickname ] = useState('');
+
     const handleNicknameCheck = () => {
         // **백엔드** 닉네임 DB에 중복확인
         // 중복 시
@@ -118,6 +128,7 @@ export function Step3Screen() {
     }
     const handleSignupComplete = () => {
         // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
+        console.log(email, password, nickname);
         // 중복확인이 false 상태면 '닉네임 중복검사를 해주세요.' 라는 Alert 띄움.
     }
     return (
@@ -128,7 +139,8 @@ export function Step3Screen() {
             <View style={styles.nickname_box}>
                 <TextInput
                     style={styles.nickname_input}
-                    placeholder="닉네임" />
+                    placeholder="닉네임" 
+                    onChangeText={setNickname}/>
                 <Pressable
                     style={styles.nickname_check}
                     onPress={handleNicknameCheck}>
