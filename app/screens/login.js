@@ -1,16 +1,45 @@
 import {useState} from 'react';
 import { Link } from "expo-router";
 
-import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image,Switch } from "react-native";
+import { KeyboardAvoidingView,Platform,StyleSheet, View,TextInput, Button,Text,Image,Switch, Alert } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 // 드래그 & ctrl alt l -> 자동 정렬
-// navigation.navigate('Step1'); -> 회원가입 
 
 export default function Login({navigation}){
     const [emailPrefix, setEmailPrefix] = useState('');
     const [password, setPassword] = useState('');
     const [stayLoggedIn, setStayLoggedIn] = useState(false);
 
+    // 로그인 버튼 눌렀을 때
+    const handleConfirm = async()=>{
+        const fullEmail = `${emailPrefix}@mju.ac.kr`;
+        console.log(JSON.stringify({email:fullEmail, password: password}))
+
+/*         try{
+            const response = await fetch('api_url_써야돼',{
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({email:fullEmail, password: password}),
+            });
+
+            const result = await response.json(); //백으로 받은 json 응답
+
+            if(response.ok){
+                Alert.alert('성공', '이메일이 성공적으로 전송되었습니다.');
+            }
+            else{
+                Alert.alert('실패','전송 실패');
+            }
+        }
+        catch(error){
+            Alert.alert('오류','네트워크 오류');
+        }; */
+    }
+    
+ 
+    //이메일 콘솔에 뭐라고 찍히는지 확인하기
     return (
         <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -60,6 +89,7 @@ export default function Login({navigation}){
                 <Button
                 style = {styles.confirm}
                 title = "로그인"
+                onPress={handleConfirm}
                 />
             </View>
             <View style={styles.cant}>
