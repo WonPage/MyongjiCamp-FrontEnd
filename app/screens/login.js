@@ -126,12 +126,15 @@ export default function Login({ navigation }) {
 
                     <View style={styles.app_tour}>
 
-                    <TouchableOpacity
-                    style={styles.app_tour_button}
+                        <TouchableOpacity
+                            style={styles.app_tour_button}
                             onPress={handleAppTour}>
-                            <Text>앱 둘러보기</Text>
+                            <Text style={styles.app_tour_button_txt}>앱 둘러보기</Text>
                         </TouchableOpacity>
+
                     </View>
+                    <View style={styles.ignore}></View>
+
                 </View>
             </View>
         </DefaultLayout>
@@ -148,7 +151,7 @@ const styles = StyleSheet.create({
         height: '80%',
     },
     icon: {
-        flex: 3,
+        flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
 
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
         width: 100,
     },
     input: {
-        flex: 2.5,
+        flex: 2,
         justifyContent : "space-around"
     },
     input_box: {
@@ -229,17 +232,25 @@ const styles = StyleSheet.create({
         fontSize:15,
     },
     app_tour: {
-        flex: 2,
-        backgroundColor : "red",
-        alignItems : "center",
-        justifyContent : "center"
+        flex: 1,
+        justifyContent : "center",
+        alignItems : "center"
     },
     app_tour_button : {
         borderRadius: 20,
-        height : 60,
-        backgroundColor: "#002E66",
+        width : "60%",
+        height : 50,
+        borderColor : "#002E66",
+        borderWidth : 3,
         justifyContent: "center",
         alignItems: "center"
+    },
+    app_tour_button_txt : {
+        fontSize : 18,
+    },
+    
+    ignore : {
+        flex : 1,
     }
 
 });
