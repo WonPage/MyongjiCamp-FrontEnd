@@ -1,6 +1,8 @@
+import { KeyboardAwareScrollView } from "@pietile-native-kit/keyboard-aware-scrollview";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -39,26 +41,34 @@ export function Step1Screen({navigation}) {
     }
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.container}>
-                <Image
+            <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+                <StatusBar style='auto'/>
+                <View style={styles.top_blank}></View>
+                <View style={styles.icon_container}>
+                    <Image
                     style={styles.myongji_icon}
                     source={require('../../assets/myongji-icon.png')} />
-
-                <Text style={styles.email_text}>학교 인증을 완료해주세요.</Text>
-                <View style={styles.email_box}>
-                    <TextInput
-                        ref={inputRef}
-                        style={styles.email_value}
-                        placeholder="이메일"
-                        placeholderTextColor={"gray"}
-                        value={email}
-                        onChangeText={setEmail}
-                        maxLength={30} />
-                    <Text
-                        style={styles.email_example}
-                        onPress={handleTextClick}
-                    >@mju.ac.kr</Text>
                 </View>
+                <View style={styles.text_container}>
+                    <Text style={styles.email_text}>학교 인증을 완료해주세요.</Text>
+                </View>
+                <View style={styles.email_container}>
+                    <View style={styles.email_box}>
+                        <TextInput
+                            ref={inputRef}
+                            style={styles.email_value}
+                            placeholder="이메일"
+                            placeholderTextColor={"gray"}
+                            value={email}
+                            onChangeText={setEmail}
+                            maxLength={30} />
+                        <Text
+                            style={styles.email_example}
+                            onPress={handleTextClick}
+                        >@mju.ac.kr</Text>
+                    </View>
+                </View>
+                
                 {isCodeSent ?
                     (<View>
                         <TextInput
@@ -68,12 +78,14 @@ export function Step1Screen({navigation}) {
                         <Pressable onPress={handleResendCode}><Text>재전송</Text></Pressable>
                         <Pressable onPress={handleVerifyCode}><Text>확인</Text></Pressable>
                     </View>) :
-                    (<Pressable
-                        style={styles.email_send_button}
-                        onPress={handleCodeSend}><Text>인증번호 보내기</Text>
-                    </Pressable>)}
-                <View style={styles.blank}></View>
-            </View>
+                    (<View style={styles.button_container}>
+                        <Pressable
+                            style={styles.email_send_button}
+                            onPress={handleCodeSend}><Text style={styles.send_button_text}>인증번호 보내기</Text>
+                        </Pressable>
+                    </View>)}
+                <View style={styles.buttom_blank}></View>
+            </KeyboardAwareScrollView>
         </TouchableWithoutFeedback>
     )
 }
@@ -140,6 +152,7 @@ export function Step3Screen({route, navigation}) {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
+                <StatusBar style="auto"/>
                 <Image
                     style={styles.myongji_icon}
                     source={require('../../assets/myongji-icon.png')} />
@@ -172,43 +185,35 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginHorizontal: 40,
     },
-    text: {
-        fontSize: 28,
-    },
-    myongji_icon: {
-        flex: 1.2,
-        justifyContent: "center",
-        alignItems: "center",
-        resizeMode: "contain",
-        // backgroundColor: 'pink'
-    },
-    email_text: {
-        flex: 0.4,
-        fontSize: 18,
-        // backgroundColor: 'green',
-    },
-    email_box: {
-        flex:0.3, 
+    icon_container:{flex: 0.8, justifyContent: "center", alignItems: "center"},
+    text_container: {flex: 0.3, justifyContent: 'center', alignItems: 'center'},
+    email_container: {flex:0.6, justifyContent: 'center', alignItems: 'center'},
+    button_container: {flex: 0.3, justifyContent: 'center', alignItems: 'center'},
+    top_blank:{flex: 0.5,},
+    buttom_blank:{flex: 0.8,},
+    text: {fontSize: 28},
+    myongji_icon: {},
+    email_text: {fontSize: 18, },
+    email_box: { 
+        height: 50,
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderRadius: 20,
+        borderRadius: 16,
         paddingHorizontal: 20,
     },
-    email_value: {
-        flex: 1,
-    },
-    email_example: {
-        color: 'gray'
-    },
+    email_value: {flex: 1},
+    email_example: {color: 'gray'},
     email_send_button: {
-        width: 130,
+        width: 140,
         height: 50,
-        borderRadius: 20,
-        backgroundColor: "skyblue",
-        marginTop: 40,
+        borderRadius: 30,
+        backgroundColor: "#0D47A1",
         justifyContent: "center",
         alignItems: 'center',
+    },
+    send_button_text:{
+        color: 'white'
     },
     password_box: {
         borderWidth: 1,
@@ -224,8 +229,4 @@ const styles = StyleSheet.create({
     signup_button: {
         backgroundColor: "yellow"
     },
-    blank:{
-        flex: 0.8,  
-        // backgroundColor: "red",
-    }
 });
