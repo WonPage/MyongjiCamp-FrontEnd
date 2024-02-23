@@ -250,7 +250,12 @@ export function Step3Screen({route, navigation}) {
             return Alert.alert('경고', '닉네임 중복검사를 해주세요.');
         }
         //지금까지의 이메일, 비번, 닉네임을 DB에 보냄
-        console.log(email, password, nickname);
+        const userData = {
+            eamil: email,
+            password: password,
+            nickname: nickname
+        }
+        console.log(userData);
         navigation.navigate('Login');
     }
     return (
