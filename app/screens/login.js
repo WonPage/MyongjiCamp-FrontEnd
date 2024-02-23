@@ -101,10 +101,11 @@ export default function Login({ navigation }) {
                         </View>
                     </View>
                     {/* <View style={styles.checkBox_container}> */}
-{/* 여기여기 */}
+                    {/* 여기여기 */}
                     {/* </View> */}
+                    <View style={styles.ignore_up}></View>
                     <View style={styles.confirm}>
-                    <TouchableOpacity
+                        <TouchableOpacity
                             style={styles.confirm_button}
                             onPress={handleConfirm}>
                             <Text style={styles.confirm_button_txt}>로그인</Text>
@@ -112,12 +113,12 @@ export default function Login({ navigation }) {
                     </View>
                     <View style={styles.cant}>
                         <TouchableOpacity
-                        style={styles.cant_findPassword_button}
+                            style={styles.cant_findPassword_button}
                             onPress={handleFindPassword}>
                             <Text style={styles.cant_findPassword_button_txt}>비밀번호 찾기</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                        style={styles.cant_singup_button}
+                            style={styles.cant_singup_button}
                             onPress={() => navigation.navigate('Step1')}>
                             <Text style={styles.cant_singup_button_txt}>회원가입</Text>
                         </TouchableOpacity>
@@ -133,7 +134,7 @@ export default function Login({ navigation }) {
                         </TouchableOpacity>
 
                     </View>
-                    <View style={styles.ignore}></View>
+                    <View style={styles.ignore_down}></View>
 
                 </View>
             </View>
@@ -193,6 +194,9 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'flex-end',
     },
+    ignore_up : {
+        flex : 0.3,
+    },
     confirm: {
         flex: 1,
         justifyContent:"center",
@@ -248,8 +252,8 @@ const styles = StyleSheet.create({
     app_tour_button_txt : {
         fontSize : 18,
     },
-    
-    ignore : {
+
+    ignore_down : {
         flex : 1,
     }
 
