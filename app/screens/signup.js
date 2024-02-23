@@ -1,10 +1,12 @@
-import { KeyboardAwareScrollView } from "@pietile-native-kit/keyboard-aware-scrollview";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from "react-native";
+import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform } from "react-native";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import DefaultLayout from "../layout/defaultlayout";
 
 const Stack = createNativeStackNavigator();
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export function Step1Screen({navigation}) {
     const inputRef = useRef();
@@ -40,17 +42,17 @@ export function Step1Screen({navigation}) {
         });
     }
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-                <StatusBar style='auto'/>
+        <DefaultLayout>
+            <View style={styles.container}>
+                <StatusBar style='auto' />
                 <View style={styles.top_blank}></View>
                 <View style={styles.icon_container}>
                     <Image
-                    style={styles.myongji_icon}
-                    source={require('../../assets/myongji-icon.png')} />
+                        style={styles.myongji_icon}
+                        source={require('../../assets/myongji-icon.png')} />
                 </View>
                 <View style={styles.text_container}>
-                    <Text style={styles.email_text}>학교 인증을 완료해주세요.</Text>
+                    <Text style={styles.text}>학교 인증을 완료해주세요.</Text>
                 </View>
                 <View style={styles.email_container}>
                     <View style={styles.email_box}>
@@ -61,14 +63,15 @@ export function Step1Screen({navigation}) {
                             placeholderTextColor={"gray"}
                             value={email}
                             onChangeText={setEmail}
-                            maxLength={30} />
+                            maxLength={30}
+                            onSubmitEditing={handleCodeSend} />
                         <Text
                             style={styles.email_example}
                             onPress={handleTextClick}
                         >@mju.ac.kr</Text>
                     </View>
                 </View>
-                
+
                 {isCodeSent ?
                     (<View>
                         <TextInput
@@ -85,11 +88,11 @@ export function Step1Screen({navigation}) {
                         </Pressable>
                     </View>)}
                 <View style={styles.buttom_blank}></View>
-            </KeyboardAwareScrollView>
-        </TouchableWithoutFeedback>
+            </View>
+        </DefaultLayout>
     )
 }
-export function Step2Screen({ route, navigation }) {    
+export function Step2Screen({ route, navigation }) {
     const { email } = route.params;
 
     const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
@@ -107,28 +110,40 @@ export function Step2Screen({ route, navigation }) {
         }
         // 모든 검증을 마쳤으면 비밀번호를 저장 (**백엔드**) 하고 다음단계로 이동.
         navigation.navigate('Step3', {
-            email : email,
-            password : password,
+            email: email,
+            password: password,
         });
     }
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <DefaultLayout>
             <View style={styles.container}>
-                <Image
-                    style={styles.myongji_icon}
-                    source={require('../../assets/myongji-icon.png')} />
-                <Text>안전한 비밀번호를 만들어주세요.</Text>
-                <TextInput style={styles.password_box}
-                placeholder="비밀번호 입력"
-                onChangeText={setPassword} />
-                <TextInput style={styles.password_box}
-                placeholder="비밀번호 재입력"
-                onChangeText={setPasswordCheck}/>
-                <Pressable
-                    onPress={handlePasswordCheck}><Text>확인</Text>
-                </Pressable>
+                <StatusBar style="auto"/>
+                <View style={styles.top_blank}></View>
+                <View style={styles.icon_container}>
+                    <Image
+                        style={styles.myongji_icon}
+                        source={require('../../assets/myongji-icon.png')} />
+                </View>
+                <View style={styles.text_container}>
+                    <Text style={styles.text}>안전한 비밀번호를 만들어주세요.</Text>
+                </View>
+                <View style={styles.password_container}>
+                    <TextInput style={styles.password_input}
+                        placeholder="비밀번호 입력"
+                        onChangeText={setPassword} />
+                    <TextInput style={styles.password_input}
+                        placeholder="비밀번호 재입력"
+                        onChangeText={setPasswordCheck} />
+                </View>
+                <View style={styles.password_button_container}>
+                  <Pressable
+                    style={styles.password_button}
+                    onPress={handlePasswordCheck}><Text style={styles.password_button_text}>확인</Text>
+                </Pressable>   
+                </View>
+                <View style={styles.buttom_blank}></View>
             </View>
-        </TouchableWithoutFeedback>
+        </DefaultLayout>
     )
 }
 export function Step3Screen({route, navigation}) {
@@ -150,13 +165,16 @@ export function Step3Screen({route, navigation}) {
         // 중복확인이 false 상태면 '닉네임 중복검사를 해주세요.' 라는 Alert 띄움.
     }
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <DefaultLayout>
             <View style={styles.container}>
                 <StatusBar style="auto"/>
-                <Image
+                <View style={styles.top_blank}></View>
+                <View style={styles.icon_container}>
+                    <Image
                     style={styles.myongji_icon}
                     source={require('../../assets/myongji-icon.png')} />
-                <View style={styles.nickname_box}>
+                </View>
+                <View style={styles.nickname_container}>
                     <TextInput
                         style={styles.nickname_input}
                         placeholder="닉네임" 
@@ -167,33 +185,35 @@ export function Step3Screen({route, navigation}) {
                         <Text>중복확인</Text>
                     </Pressable>
                 </View>
-                <Pressable
-                style={styles.signup_button}
-                onPress={handleSignupComplete}>
-                    <Text>회원가입 완료</Text>
-                </Pressable>
+                <View style={styles.signup_button_container}>
+                    <Pressable
+                        style={styles.signup_button}
+                        onPress={handleSignupComplete}>
+                        <Text style={styles.signup_button_text}>회원가입 완료</Text>
+                    </Pressable>
+                </View>
+                <View style={styles.buttom_blank}></View>
             </View>
-        </TouchableWithoutFeedback>
+        </DefaultLayout>
     )
 }
 
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+    container:{
+        flex:1,
+        alignItems: 'stretch',
         marginHorizontal: 40,
+        // backgroundColor: 'red'
     },
-    icon_container:{flex: 0.8, justifyContent: "center", alignItems: "center"},
-    text_container: {flex: 0.3, justifyContent: 'center', alignItems: 'center'},
-    email_container: {flex:0.6, justifyContent: 'center', alignItems: 'center'},
-    button_container: {flex: 0.3, justifyContent: 'center', alignItems: 'center'},
-    top_blank:{flex: 0.5,},
-    buttom_blank:{flex: 0.8,},
-    text: {fontSize: 28},
+    icon_container:{flex: 8, justifyContent: "center", alignItems: "center"},
+    text_container: {flex: 3, justifyContent: 'center', alignItems: 'center'},
+    email_container: {flex:6, justifyContent: 'center', alignItems: 'center'},
+    button_container: {flex: 3, justifyContent: 'center', alignItems: 'center'},
+    top_blank:{flex: 5,},
+    buttom_blank:{flex: 8,},
     myongji_icon: {},
-    email_text: {fontSize: 18, },
+    text: {fontSize: 18},
     email_box: { 
         height: 50,
         flexDirection: 'row',
@@ -215,18 +235,58 @@ const styles = StyleSheet.create({
     send_button_text:{
         color: 'white'
     },
-    password_box: {
-        borderWidth: 1,
+    password_container: {
     },
-    nickname_box: {
-        flexDirection: 'row',
+    password_input: {
+        height: 50,
         borderWidth: 1,
+        borderRadius: 16,
+        marginBottom: 10,
+        paddingHorizontal: 20,
+    },
+    password_button_container:{
+        flex: 1,
+        alignItems: 'center'
+    },
+    password_button:{
+        width: 140,
+        height: 50,
+        borderRadius: 30,
+        backgroundColor: "#0D47A1",
+        justifyContent: "center",
+        alignItems: 'center',
+    },
+    password_button_text:{
+        color: 'white',
+    },
+    nickname_container: {
+        flex: 2,
+        justifyContent: 'center',
+        flexDirection: 'row',
+    },
+    nickname_input: {
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 16,
     },
     nickname_check: {
         margin: 5,
         backgroundColor: "skyblue",
     },
-    signup_button: {
-        backgroundColor: "yellow"
+    signup_button_container: {
+        flex: 1,
+        alignItems: 'center'
     },
+    signup_button: {
+        width: 140,
+        height: 50,
+        borderRadius: 30,
+        backgroundColor: "#0D47A1",
+        justifyContent: "center",
+        alignItems: 'center',
+    },
+    signup_button_text: {
+        color: 'white',
+    }
+
 });
