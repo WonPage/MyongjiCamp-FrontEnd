@@ -4,6 +4,7 @@ import { Link } from "expo-router";
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, View, TextInput, Button, Text, Image, Switch, Alert, TouchableOpacity } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import DefaultLayout from "../layout/defaultlayout";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
@@ -17,7 +18,7 @@ export default function Login({ navigation }) {
         const fullEmail = `${emailPrefix}@mju.ac.kr`;
         // console.log(JSON.stringify({ email: fullEmail, password: password }))
 
-        /*         try{
+                 try{
                     const response = await fetch('api_url_써야돼',{
                         method: 'POST',
                         headers: {
@@ -26,16 +27,17 @@ export default function Login({ navigation }) {
                         body : JSON.stringify({email:fullEmail, password: password}),
                     });
                     const result = await response.json(); //백으로 받은 json 응답
-
         
-                    if(response.ok && result.loginSuccess){
+                    if(result.ok){
+                        if(stayLoggedIn){
+                            await AsyncStorage.setItem('key',JSON.stringify({email:fullEmail, password: password}));
+                        }
                         Alert.alert('로그인 성공', '나 확인용(지울거)');
                         // 메인 화면 열어야 됨
                     }
                     else{
                         Alert.alert('로그인 실패','이메일 또는 비밀번호가 잘못되었습니다.');
                         setPassword('');
-
                     }
                     
                     
@@ -45,7 +47,7 @@ export default function Login({ navigation }) {
                 }
                 catch(error){
                     Alert.alert('오류','네트워크 오류가 발생하였습니다.');
-                }; */
+                }; 
     }
 
     // 비밀번호 찾기 버튼 눌렀을 때
@@ -97,12 +99,10 @@ export default function Login({ navigation }) {
                                 }}
                                 fillColor='#008FD5'
                                 text="로그인 유지"
+                                onPress={setStayLoggedIn}
                             />
                         </View>
                     </View>
-                    {/* <View style={styles.checkBox_container}> */}
-                    {/* 여기여기 */}
-                    {/* </View> */}
                     <View style={styles.ignore_up}></View>
                     <View style={styles.confirm}>
                         <TouchableOpacity
@@ -152,14 +152,14 @@ const styles = StyleSheet.create({
         height: '80%',
     },
     icon: {
-        flex: 2,
+        flex: 2.5,
         justifyContent: 'center',
         alignItems: 'center',
 
     },
     myongji_icon: {
-        height: 100,
-        width: 100,
+        height: 130,
+        width: 130,
     },
     input: {
         flex: 2,
@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
 
     ignore_down : {
         flex : 1,
+        backgroundColor:"red"
     }
 
 });
