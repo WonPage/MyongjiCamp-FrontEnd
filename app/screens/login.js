@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, View, TextInput, Button, Text, Image, Switch, Alert, TouchableOpacity } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import DefaultLayout from "../layout/defaultlayout";
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
@@ -59,10 +60,8 @@ export default function Login({ navigation }) {
 
     //이메일 콘솔에 뭐라고 찍히는지 확인하기
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                style={styles.container}>
+        <DefaultLayout>
+            <View style={styles.container}>
                 <View style={styles.container_width}>
                     <View style={styles.icon}>
                         <Image
@@ -134,8 +133,8 @@ export default function Login({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </KeyboardAvoidingView>
-        </TouchableWithoutFeedback>
+            </View>
+        </DefaultLayout>
     );
 }
 const styles = StyleSheet.create({
@@ -232,9 +231,15 @@ const styles = StyleSheet.create({
     app_tour: {
         flex: 2,
         backgroundColor : "red",
+        alignItems : "center",
+        justifyContent : "center"
     },
     app_tour_button : {
-
+        borderRadius: 20,
+        height : 60,
+        backgroundColor: "#002E66",
+        justifyContent: "center",
+        alignItems: "center"
     }
 
 });
