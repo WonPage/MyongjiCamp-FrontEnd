@@ -26,5 +26,5 @@ export default function Layout(){
 const signupOption = {
     title: '회원가입',
     headerTitleAlign: 'center',
-    headerShadowVisible: false
+    headerShadowVisible: false,
 }

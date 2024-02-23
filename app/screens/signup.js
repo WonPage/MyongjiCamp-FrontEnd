@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform } from "react-native";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity } from "react-native";
+import * as Progress from 'react-native-progress';
 import DefaultLayout from "../layout/defaultlayout";
 
 const Stack = createNativeStackNavigator();
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export function Step1Screen({navigation}) {
     const inputRef = useRef();
@@ -43,52 +43,68 @@ export function Step1Screen({navigation}) {
     }
     return (
         <DefaultLayout>
-            <View style={styles.container}>
-                <StatusBar style='auto' />
-                <View style={styles.top_blank}></View>
-                <View style={styles.icon_container}>
-                    <Image
-                        style={styles.myongji_icon}
-                        source={require('../../assets/myongji-icon.png')} />
-                </View>
-                <View style={styles.text_container}>
-                    <Text style={styles.text}>학교 인증을 완료해주세요.</Text>
-                </View>
-                <View style={styles.email_container}>
-                    <View style={styles.email_box}>
-                        <TextInput
-                            ref={inputRef}
-                            style={styles.email_value}
-                            placeholder="이메일"
-                            placeholderTextColor={"gray"}
-                            value={email}
-                            onChangeText={setEmail}
-                            maxLength={30}
-                            onSubmitEditing={handleCodeSend} />
-                        <Text
-                            style={styles.email_example}
-                            onPress={handleTextClick}
-                        >@mju.ac.kr</Text>
+            <>
+                <Progress.Bar
+                style={styles.progress} progress={0.33}
+                width={SCREEN_WIDTH} height={10} animated={true}
+                color={'#002E66'}/>
+                <View style={styles.container}>
+                    <StatusBar style='auto' />
+                    <View style={styles.top_blank}></View>
+                    <View style={styles.icon_container}>
+                        <Image
+                            style={styles.myongji_icon}
+                            source={require('../../assets/myongji-icon.png')} />
                     </View>
-                </View>
+                    <View style={styles.text_container}>
+                        <Text style={styles.text}>학교 인증을 완료해주세요.</Text>
+                    </View>
+                    <View style={styles.email_container}>
+                        <View style={styles.email_box}>
+                            <TextInput
+                                ref={inputRef}
+                                style={styles.email_value}
+                                placeholder="이메일"
+                                placeholderTextColor={"gray"}
+                                value={email}
+                                onChangeText={setEmail}
+                                maxLength={30}
+                                onSubmitEditing={handleCodeSend} />
+                            <Text
+                                style={styles.email_example}
+                                onPress={handleTextClick}
+                            >@mju.ac.kr</Text>
+                        </View>
+                    </View>
 
-                {isCodeSent ?
-                    (<View>
-                        <TextInput
-                            onChangeText={setCode}
-                            value={code}
-                            placeholder="인증코드" />
-                        <Pressable onPress={handleResendCode}><Text>재전송</Text></Pressable>
-                        <Pressable onPress={handleVerifyCode}><Text>확인</Text></Pressable>
-                    </View>) :
-                    (<View style={styles.button_container}>
-                        <Pressable
-                            style={styles.email_send_button}
-                            onPress={handleCodeSend}><Text style={styles.send_button_text}>인증번호 보내기</Text>
-                        </Pressable>
-                    </View>)}
-                <View style={styles.buttom_blank}></View>
-            </View>
+                    {isCodeSent ?
+                        (<>
+                            <View style={styles.code_container}>
+                                <TextInput
+                                    style={styles.code_input}
+                                    onChangeText={setCode}
+                                    value={code}
+                                    placeholder="인증코드" />
+                                <TouchableOpacity style={styles.code_resend}
+                                onPress={handleResendCode}
+                                activeOpacity={0.7}><Text style={styles.resend_text}>재전송</Text></TouchableOpacity>
+                            </View>
+                            <View style={styles.code_confirm_container}>
+                                <TouchableOpacity style={styles.code_confirm}
+                                onPress={handleVerifyCode}
+                                activeOpacity={0.7}><Text style={styles.confirm_text}>확인</Text></TouchableOpacity>                                
+                            </View>
+                        </>) :
+                        (<View style={styles.button_container}>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                style={styles.email_send_button}
+                                onPress={handleCodeSend}><Text style={styles.send_button_text}>인증번호 보내기</Text>
+                            </TouchableOpacity>
+                        </View>)}
+                    <View style={styles.buttom_blank}></View>
+                </View>
+            </>
         </DefaultLayout>
     )
 }
@@ -116,6 +132,11 @@ export function Step2Screen({ route, navigation }) {
     }
     return (
         <DefaultLayout>
+            <>
+            <Progress.Bar 
+            style={styles.progress} 
+            progress={0.66} width={SCREEN_WIDTH} height={10} animated={true}
+            color={'#002E66'}/>
             <View style={styles.container}>
                 <StatusBar style="auto"/>
                 <View style={styles.top_blank}></View>
@@ -130,19 +151,24 @@ export function Step2Screen({ route, navigation }) {
                 <View style={styles.password_container}>
                     <TextInput style={styles.password_input}
                         placeholder="비밀번호 입력"
-                        onChangeText={setPassword} />
+                        onChangeText={setPassword}
+                        secureTextEntry />
                     <TextInput style={styles.password_input}
                         placeholder="비밀번호 재입력"
-                        onChangeText={setPasswordCheck} />
+                        onChangeText={setPasswordCheck}
+                        secureTextEntry
+                        onSubmitEditing={handlePasswordCheck} />
                 </View>
                 <View style={styles.password_button_container}>
-                  <Pressable
+                  <TouchableOpacity
                     style={styles.password_button}
-                    onPress={handlePasswordCheck}><Text style={styles.password_button_text}>확인</Text>
-                </Pressable>   
+                    onPress={handlePasswordCheck}
+                    activeOpacity={0.7}><Text style={styles.password_button_text}>확인</Text>
+                </TouchableOpacity>   
                 </View>
                 <View style={styles.buttom_blank}></View>
             </View>
+            </>
         </DefaultLayout>
     )
 }
@@ -166,6 +192,11 @@ export function Step3Screen({route, navigation}) {
     }
     return (
         <DefaultLayout>
+            <>
+            <Progress.Bar
+            style={styles.progress}
+            progress={1} width={SCREEN_WIDTH} height={10} animated={true}
+            color={'#002E66'} />
             <View style={styles.container}>
                 <StatusBar style="auto"/>
                 <View style={styles.top_blank}></View>
@@ -178,11 +209,12 @@ export function Step3Screen({route, navigation}) {
                     <TextInput
                         style={styles.nickname_input}
                         placeholder="닉네임" 
-                        onChangeText={setNickname}/>
+                        onChangeText={setNickname}
+                        onSubmitEditing={handleNicknameCheck} />
                     <Pressable
                         style={styles.nickname_check}
                         onPress={handleNicknameCheck}>
-                        <Text>중복확인</Text>
+                        <Text style={{color:'white'}}>중복확인</Text>
                     </Pressable>
                 </View>
                 <View style={styles.signup_button_container}>
@@ -194,6 +226,7 @@ export function Step3Screen({route, navigation}) {
                 </View>
                 <View style={styles.buttom_blank}></View>
             </View>
+            </>
         </DefaultLayout>
     )
 }
@@ -205,6 +238,11 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         marginHorizontal: 40,
         // backgroundColor: 'red'
+    },
+    progress:{
+        alignSelf: 'stretch',
+        borderWidth: 0,
+        backgroundColor: '#E9ECEF',
     },
     icon_container:{flex: 8, justifyContent: "center", alignItems: "center"},
     text_container: {flex: 3, justifyContent: 'center', alignItems: 'center'},
@@ -228,12 +266,50 @@ const styles = StyleSheet.create({
         width: 140,
         height: 50,
         borderRadius: 30,
-        backgroundColor: "#0D47A1",
+        backgroundColor: "#002E66",
         justifyContent: "center",
         alignItems: 'center',
     },
     send_button_text:{
         color: 'white'
+    },
+    code_container:{
+        flex: 3,
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        marginBottom: 35,
+    },
+    code_input:{
+        flex:1,
+        borderWidth: 1,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        marginRight: 30,
+    },
+    code_resend:{
+        width: 70,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#008FD5',
+    },
+    resend_text:{
+        color: 'white',
+    },
+    code_confirm_container:{
+        flex: 2.6,
+        alignItems: 'center',
+    },
+    code_confirm:{
+        flex: 1,
+        borderRadius: 20,
+        width: '50%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#002E66"
+    },
+    confirm_text: {
+        color: 'white',
     },
     password_container: {
     },
@@ -252,7 +328,7 @@ const styles = StyleSheet.create({
         width: 140,
         height: 50,
         borderRadius: 30,
-        backgroundColor: "#0D47A1",
+        backgroundColor: "#002E66",
         justifyContent: "center",
         alignItems: 'center',
     },
@@ -261,17 +337,22 @@ const styles = StyleSheet.create({
     },
     nickname_container: {
         flex: 2,
-        justifyContent: 'center',
         flexDirection: 'row',
+        marginBottom: 35,
     },
     nickname_input: {
         flex: 1,
         borderWidth: 1,
         borderRadius: 16,
+        marginRight: 16,
+        paddingHorizontal: 20,
     },
     nickname_check: {
-        margin: 5,
+        width: 60,
         backgroundColor: "skyblue",
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     signup_button_container: {
         flex: 1,
@@ -281,7 +362,7 @@ const styles = StyleSheet.create({
         width: 140,
         height: 50,
         borderRadius: 30,
-        backgroundColor: "#0D47A1",
+        backgroundColor: "#002E66",
         justifyContent: "center",
         alignItems: 'center',
     },
