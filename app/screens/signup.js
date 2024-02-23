@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity } from "react-native";
+import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
 import DefaultLayout from "../layout/defaultlayout";
 
@@ -14,7 +14,17 @@ export function Step1Screen({navigation}) {
     const regex = /^[a-zA-Z0-9]+$/
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
-    const [isCodeSent, SetIsCodeSent] = useState(false);
+    const [isCodeSent, setIsCodeSent] = useState(false);
+    const [isCodeEmpty, setIsCodeEmpty] = useState(true);
+    const [isWrong, setIsWrong] = useState(false);
+
+    // 4글자 인증번호를 채우지 않으면 확인이 활성화되지 않음.
+    useEffect(()=>{
+        if (code.length===4) setIsCodeEmpty(false);
+        else setIsCodeEmpty(true); 
+
+        if (isWrong){}
+    }, [code, isWrong]);
 
     const handleTextClick = () => {
         inputRef.current.focus();
@@ -28,25 +38,37 @@ export function Step1Screen({navigation}) {
         }
         // **백엔드** 인증코드 보내기
         //성공 시
-        SetIsCodeSent(true);
+        setIsCodeSent(true);
         //실패 시
         //return Alert.alert('오류', '전송에 실패하였습니다.');
     }
     const handleResendCode = () => {
+        setCode('');
         //이메일 인증번호 재전송 코드
+        return Alert.alert('안내', '인증번호를 재전송했습니다.');
     }
     const handleVerifyCode = () => {
-        //인증번호 인증하기 버튼
-        navigation.navigate('Step2', {
-            email: email, 
-        });
+        // **백엔드** 코드가 우리가 보낸값과 일치하는지 확인
+        if (code === '9999') {
+            navigation.navigate('Step2', {
+                email: email, 
+            });
+            setIsWrong(false);
+        }
+        else {
+            setCode('');
+            setIsWrong(true);
+            // return Alert.alert('경고', '인증번호가 일치하지 않습니다.');
+        }
+
     }
     return (
         <DefaultLayout>
             <>
                 <Progress.Bar
                 style={styles.progress} progress={0.33}
-                width={SCREEN_WIDTH} height={10} animated={true}
+                width={SCREEN_WIDTH} height={10}
+                animated={true} 
                 color={'#002E66'}/>
                 <View style={styles.container}>
                     <StatusBar style='auto' />
@@ -81,16 +103,21 @@ export function Step1Screen({navigation}) {
                         (<>
                             <View style={styles.code_container}>
                                 <TextInput
-                                    style={styles.code_input}
+                                    style={isWrong ? styles.code_input_wrong : styles.code_input}
                                     onChangeText={setCode}
                                     value={code}
-                                    placeholder="인증코드" />
+                                    maxLength={4}
+                                    keyboardType="numeric"
+                                    placeholder={isWrong? "다시 입력해주세요." : "인증코드"}
+                                    placeholderTextColor={isWrong ? 'red' : undefined}
+                                    />
                                 <TouchableOpacity style={styles.code_resend}
                                 onPress={handleResendCode}
                                 activeOpacity={0.7}><Text style={styles.resend_text}>재전송</Text></TouchableOpacity>
                             </View>
                             <View style={styles.code_confirm_container}>
-                                <TouchableOpacity style={styles.code_confirm}
+                                <TouchableOpacity style={isCodeEmpty ? styles.code_not_confirm : styles.code_confirm}
+                                disabled={isCodeEmpty}
                                 onPress={handleVerifyCode}
                                 activeOpacity={0.7}><Text style={styles.confirm_text}>확인</Text></TouchableOpacity>                                
                             </View>
@@ -110,18 +137,30 @@ export function Step1Screen({navigation}) {
 }
 export function Step2Screen({ route, navigation }) {
     const { email } = route.params;
-
+    const [progress, setProgress] = useState(0.33);
+    const [isPasswordWrong, setIsPasswordWrong] = useState(false);
+    const [isPasswordCheckWrong, setIsPasswordCheckWrong] = useState(false);
+    useEffect(()=>{
+        setProgress(0.66);
+    },[]);
     const passwordRegExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*&])(?=.*[0-9]).{8,20}$/; //안전 비밀번호 정규식
     const [password, setPassword] = useState('');
     const [passwordCheck, setPasswordCheck] = useState('');
     const handlePasswordCheck = () => {
         if (password.length === 0) {
+            setIsPasswordWrong(true);
             return Alert.alert('경고', '비밀번호를 입력해주세요.');
         } else if (!passwordRegExp.test(password)) {
-            return Alert.alert('경고', '안전하지 않은 비밀번호입니다.')
+            setIsPasswordWrong(true);
+            setPasswordCheck('');
+            return Alert.alert('경고', '안전하지 않은 비밀번호입니다.\n\n영문, 숫자, 특수문자 포함 8글자 이상의 비밀번호를 설정해주세요.')
         } else if (passwordCheck.length === 0) {
+            setIsPasswordWrong(false);
+            setIsPasswordCheckWrong(true);
             return Alert.alert('경고', '비밀번호 재입력을 입력해주세요.')
         } else if (password !== passwordCheck) {
+            setIsPasswordWrong(false);
+            setIsPasswordCheckWrong(true);
             return Alert.alert('경고', '동일한 비밀번호를 입력해주세요.')
         }
         // 모든 검증을 마쳤으면 비밀번호를 저장 (**백엔드**) 하고 다음단계로 이동.
@@ -129,13 +168,15 @@ export function Step2Screen({ route, navigation }) {
             email: email,
             password: password,
         });
+        setIsPasswordWrong(false);
+        setIsPasswordCheckWrong(false);
     }
     return (
         <DefaultLayout>
             <>
             <Progress.Bar 
             style={styles.progress} 
-            progress={0.66} width={SCREEN_WIDTH} height={10} animated={true}
+            progress={progress} width={SCREEN_WIDTH} height={10} animated={true}
             color={'#002E66'}/>
             <View style={styles.container}>
                 <StatusBar style="auto"/>
@@ -149,12 +190,16 @@ export function Step2Screen({ route, navigation }) {
                     <Text style={styles.text}>안전한 비밀번호를 만들어주세요.</Text>
                 </View>
                 <View style={styles.password_container}>
-                    <TextInput style={styles.password_input}
-                        placeholder="비밀번호 입력"
+                    <TextInput style={isPasswordWrong ? styles.password_input_wrong : styles.password_input}
+                        placeholder={isPasswordWrong ? "영문,숫자,특수문자 포함 8글자 이상" : "비밀번호 입력"}
+                        placeholderTextColor={isPasswordWrong ? 'red' : undefined}
+                        value={password}
                         onChangeText={setPassword}
                         secureTextEntry />
-                    <TextInput style={styles.password_input}
-                        placeholder="비밀번호 재입력"
+                    <TextInput style={isPasswordCheckWrong ? styles.password_check_input_wrong : styles.password_check_input}
+                        placeholder={"비밀번호 재입력"}
+                        placeholderTextColor={isPasswordCheckWrong ? 'red' : undefined}
+                        value={passwordCheck}
                         onChangeText={setPasswordCheck}
                         secureTextEntry
                         onSubmitEditing={handlePasswordCheck} />
@@ -174,28 +219,46 @@ export function Step2Screen({ route, navigation }) {
 }
 export function Step3Screen({route, navigation}) {
     const { email, password } = route.params;
-
+    const [progress, setProgress] = useState(0.66);
+    useEffect(()=>{
+        setProgress(1);
+    },[])   
     const [ nickname, setNickname ] = useState('');
+    const [ nicknameWrong, setNicknameWrong ] = useState(false);
+    const [ checked, setChecked ] = useState(false);
+
+    useEffect(()=>{
+        setChecked(false);
+    }, [nickname])
 
     const handleNicknameCheck = () => {
+        if (nickname === ''){
+            return Alert.alert('경고' , '닉네임을 입력해주세요.');
+        }
         // **백엔드** 닉네임 DB에 중복확인
+        // 중복 안하면
+        Alert.alert('안내', '사용 가능한 닉네임입니다.');
+        setNicknameWrong(false);
+        setChecked(true);
         // 중복 시
         // return Alert.alert('경고', '이미 존재하는 닉네임입니다.');
-        // 중복 안하면
-        // 사용가능한 닉네임입니다. 하면서 닉네임 변경하지 않는 한 비활성화처리.
     }
     const handleSignupComplete = () => {
         // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
+        if (!checked) {
+            setNicknameWrong(true);
+            return Alert.alert('경고', '닉네임 중복검사를 해주세요.');
+        }
+        //지금까지의 이메일, 비번, 닉네임을 DB에 보냄
         console.log(email, password, nickname);
-        // navigation.navigate('Login');
-        // 중복확인이 false 상태면 '닉네임 중복검사를 해주세요.' 라는 Alert 띄움.
+        navigation.navigate('Login');
     }
     return (
         <DefaultLayout>
             <>
             <Progress.Bar
             style={styles.progress}
-            progress={1} width={SCREEN_WIDTH} height={10} animated={true}
+            progress={progress} width={SCREEN_WIDTH} height={10} animated={true}
             color={'#002E66'} />
             <View style={styles.container}>
                 <StatusBar style="auto"/>
@@ -207,22 +270,27 @@ export function Step3Screen({route, navigation}) {
                 </View>
                 <View style={styles.nickname_container}>
                     <TextInput
-                        style={styles.nickname_input}
+                        style={nicknameWrong ? styles.nickname_input_wrong : styles.nickname_input}
                         placeholder="닉네임" 
+                        placeholderTextColor={nicknameWrong? 'red' : undefined}
                         onChangeText={setNickname}
+                        value={nickname}
                         onSubmitEditing={handleNicknameCheck} />
-                    <Pressable
-                        style={styles.nickname_check}
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        disabled={checked}
+                        style={checked ? styles.nickname_check_done : styles.nickname_check}
                         onPress={handleNicknameCheck}>
                         <Text style={{color:'white'}}>중복확인</Text>
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.signup_button_container}>
-                    <Pressable
+                    <TouchableOpacity
+                        activeOpacity={0.7}
                         style={styles.signup_button}
                         onPress={handleSignupComplete}>
                         <Text style={styles.signup_button_text}>회원가입 완료</Text>
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.buttom_blank}></View>
             </View>
@@ -286,6 +354,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginRight: 30,
     },
+    code_input_wrong:{
+        flex:1,
+        borderWidth: 1,
+        borderColor: 'red',
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        marginRight: 30,
+    },
     code_resend:{
         width: 70,
         borderRadius: 20,
@@ -299,6 +375,14 @@ const styles = StyleSheet.create({
     code_confirm_container:{
         flex: 2.6,
         alignItems: 'center',
+    },
+    code_not_confirm:{
+        flex: 1,
+        borderRadius: 20,
+        width: '50%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#999999"
     },
     code_confirm:{
         flex: 1,
@@ -319,6 +403,29 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: 10,
         paddingHorizontal: 20,
+    },
+    password_input_wrong: {
+        height: 50,
+        borderWidth: 1,
+        borderRadius: 16,
+        marginBottom: 10,
+        paddingHorizontal: 20,
+        borderColor: 'red',
+    },
+    password_check_input: {
+        height: 50,
+        borderWidth: 1,
+        borderRadius: 16,
+        marginBottom: 10,
+        paddingHorizontal: 20,
+    },
+    password_check_input_wrong: {
+        height: 50,
+        borderWidth: 1,
+        borderRadius: 16,
+        marginBottom: 10,
+        paddingHorizontal: 20,
+        borderColor: 'red',
     },
     password_button_container:{
         flex: 1,
@@ -347,9 +454,24 @@ const styles = StyleSheet.create({
         marginRight: 16,
         paddingHorizontal: 20,
     },
+    nickname_input_wrong: {
+        flex: 1,
+        borderWidth: 1,
+        borderRadius: 16,
+        marginRight: 16,
+        paddingHorizontal: 20,
+        borderColor: 'red',
+    },
     nickname_check: {
         width: 60,
-        backgroundColor: "skyblue",
+        backgroundColor: "#008FD5",
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    nickname_check_done:{
+        width: 60,
+        backgroundColor: "gray",
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',

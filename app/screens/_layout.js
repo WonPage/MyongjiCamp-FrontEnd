@@ -14,7 +14,12 @@ export default function Layout(){
                 headerShown: false,
             }} />
             <Stack.Screen name="Step1" component={Step1Screen}
-            options={signupOption} />
+            options={{
+                title: '회원가입',
+                headerTitleAlign: 'center',
+                headerShadowVisible: false,
+                animation:'default',
+            }} />
             <Stack.Screen name="Step2" component={Step2Screen}
             options={signupOption} />
             <Stack.Screen name="Step3" component={Step3Screen}
@@ -27,4 +32,5 @@ const signupOption = {
     title: '회원가입',
     headerTitleAlign: 'center',
     headerShadowVisible: false,
+    animation:'none',
 }
