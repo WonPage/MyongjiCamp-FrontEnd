@@ -38,40 +38,43 @@ export function Step1Screen({navigation}) {
         });
     }
     return (
-        <View style={styles.container}>
-            <Image
-                style={styles.myongji_icon}
-                source={require('../../assets/myongji-icon.png')} />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Image
+                    style={styles.myongji_icon}
+                    source={require('../../assets/myongji-icon.png')} />
 
-            <Text>학교 인증을 완료해주세요.</Text>
-            <View style={styles.email_box}>
-                <TextInput
-                    ref={inputRef}
-                    style={styles.email_value}
-                    placeholder="이메일"
-                    placeholderTextColor={"gray"}
-                    value={email}
-                    onChangeText={setEmail}
-                    maxLength={30} />
-                <Text
-                    style={styles.email_example}
-                    onPress={handleTextClick}
-                >@mju.ac.kr</Text>
-            </View>
-            {isCodeSent ?
-                (<View>
+                <Text style={styles.email_text}>학교 인증을 완료해주세요.</Text>
+                <View style={styles.email_box}>
                     <TextInput
-                        onChangeText={setCode}
-                        value={code}
-                        placeholder="인증코드" />
-                    <Pressable onPress={handleResendCode}><Text>재전송</Text></Pressable>
-                    <Pressable onPress={handleVerifyCode}><Text>확인</Text></Pressable>
-                </View>) :
-                (<Pressable
-                    style={styles.email_send_button}
-                    onPress={handleCodeSend}><Text>인증 보내기</Text>
-                </Pressable>)}
-        </View>
+                        ref={inputRef}
+                        style={styles.email_value}
+                        placeholder="이메일"
+                        placeholderTextColor={"gray"}
+                        value={email}
+                        onChangeText={setEmail}
+                        maxLength={30} />
+                    <Text
+                        style={styles.email_example}
+                        onPress={handleTextClick}
+                    >@mju.ac.kr</Text>
+                </View>
+                {isCodeSent ?
+                    (<View>
+                        <TextInput
+                            onChangeText={setCode}
+                            value={code}
+                            placeholder="인증코드" />
+                        <Pressable onPress={handleResendCode}><Text>재전송</Text></Pressable>
+                        <Pressable onPress={handleVerifyCode}><Text>확인</Text></Pressable>
+                    </View>) :
+                    (<Pressable
+                        style={styles.email_send_button}
+                        onPress={handleCodeSend}><Text>인증번호 보내기</Text>
+                    </Pressable>)}
+                <View style={styles.blank}></View>
+            </View>
+        </TouchableWithoutFeedback>
     )
 }
 export function Step2Screen({ route, navigation }) {    
@@ -97,21 +100,23 @@ export function Step2Screen({ route, navigation }) {
         });
     }
     return (
-        <View style={styles.container}>
-            <Image
-                style={styles.myongji_icon}
-                source={require('../../assets/myongji-icon.png')} />
-            <Text>안전한 비밀번호를 만들어주세요.</Text>
-            <TextInput style={styles.password_box}
-            placeholder="비밀번호 입력"
-            onChangeText={setPassword} />
-            <TextInput style={styles.password_box}
-            placeholder="비밀번호 재입력"
-            onChangeText={setPasswordCheck}/>
-            <Pressable
-                onPress={handlePasswordCheck}><Text>확인</Text>
-            </Pressable>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Image
+                    style={styles.myongji_icon}
+                    source={require('../../assets/myongji-icon.png')} />
+                <Text>안전한 비밀번호를 만들어주세요.</Text>
+                <TextInput style={styles.password_box}
+                placeholder="비밀번호 입력"
+                onChangeText={setPassword} />
+                <TextInput style={styles.password_box}
+                placeholder="비밀번호 재입력"
+                onChangeText={setPasswordCheck}/>
+                <Pressable
+                    onPress={handlePasswordCheck}><Text>확인</Text>
+                </Pressable>
+            </View>
+        </TouchableWithoutFeedback>
     )
 }
 export function Step3Screen({route, navigation}) {
@@ -129,30 +134,33 @@ export function Step3Screen({route, navigation}) {
     const handleSignupComplete = () => {
         // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
         console.log(email, password, nickname);
+        // navigation.navigate('Login');
         // 중복확인이 false 상태면 '닉네임 중복검사를 해주세요.' 라는 Alert 띄움.
     }
     return (
-        <View style={styles.container}>
-            <Image
-                style={styles.myongji_icon}
-                source={require('../../assets/myongji-icon.png')} />
-            <View style={styles.nickname_box}>
-                <TextInput
-                    style={styles.nickname_input}
-                    placeholder="닉네임" 
-                    onChangeText={setNickname}/>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <Image
+                    style={styles.myongji_icon}
+                    source={require('../../assets/myongji-icon.png')} />
+                <View style={styles.nickname_box}>
+                    <TextInput
+                        style={styles.nickname_input}
+                        placeholder="닉네임" 
+                        onChangeText={setNickname}/>
+                    <Pressable
+                        style={styles.nickname_check}
+                        onPress={handleNicknameCheck}>
+                        <Text>중복확인</Text>
+                    </Pressable>
+                </View>
                 <Pressable
-                    style={styles.nickname_check}
-                    onPress={handleNicknameCheck}>
-                    <Text>중복확인</Text>
+                style={styles.signup_button}
+                onPress={handleSignupComplete}>
+                    <Text>회원가입 완료</Text>
                 </Pressable>
             </View>
-            <Pressable
-            style={styles.signup_button}
-            onPress={handleSignupComplete}>
-                <Text>회원가입 완료</Text>
-            </Pressable>
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 
@@ -162,18 +170,30 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginHorizontal: 40,
     },
     text: {
         fontSize: 28,
     },
     myongji_icon: {
-        height: 100,
-        width: 100
+        flex: 1.2,
+        justifyContent: "center",
+        alignItems: "center",
+        resizeMode: "contain",
+        // backgroundColor: 'pink'
+    },
+    email_text: {
+        flex: 0.4,
+        fontSize: 18,
+        // backgroundColor: 'green',
     },
     email_box: {
+        flex:0.3, 
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
+        borderRadius: 20,
+        paddingHorizontal: 20,
     },
     email_value: {
         flex: 1,
@@ -182,9 +202,13 @@ const styles = StyleSheet.create({
         color: 'gray'
     },
     email_send_button: {
-        borderWidth: 1,
+        width: 130,
+        height: 50,
+        borderRadius: 20,
         backgroundColor: "skyblue",
-        marginTop: 20,
+        marginTop: 40,
+        justifyContent: "center",
+        alignItems: 'center',
     },
     password_box: {
         borderWidth: 1,
@@ -199,5 +223,9 @@ const styles = StyleSheet.create({
     },
     signup_button: {
         backgroundColor: "yellow"
+    },
+    blank:{
+        flex: 0.8,  
+        // backgroundColor: "red",
     }
 });
