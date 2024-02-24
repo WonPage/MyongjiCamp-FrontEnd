@@ -3,7 +3,7 @@ import { Link } from "expo-router";
 
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, View, TextInput, Button, Text, Image, Switch, Alert, TouchableOpacity } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import DefaultLayout from "../layout/defaultlayout";
+import DefaultLayout from "../../layout/defaultlayout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
@@ -68,7 +68,7 @@ export default function Login({ navigation }) {
                     <View style={styles.icon}>
                         <Image
                             style={styles.myongji_icon}
-                            source={require('../../assets/myongji-icon.png')} />
+                            source={require('../../../assets/myongji-icon.png')} />
                     </View>
                     <View style={styles.input}>
                         <View style={styles.input_box}>

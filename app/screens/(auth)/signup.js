@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
-import DefaultLayout from "../layout/defaultlayout";
+import DefaultLayout from "../../layout/defaultlayout";
 
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -76,7 +76,7 @@ export function Step1Screen({navigation}) {
                     <View style={styles.icon_container}>
                         <Image
                             style={styles.myongji_icon}
-                            source={require('../../assets/myongji-icon.png')} />
+                            source={require('../../../assets/myongji-icon.png')} />
                     </View>
                     <View style={styles.text_container}>
                         <Text style={styles.text}>학교 인증을 완료해주세요.</Text>
@@ -184,7 +184,7 @@ export function Step2Screen({ route, navigation }) {
                 <View style={styles.icon_container}>
                     <Image
                         style={styles.myongji_icon}
-                        source={require('../../assets/myongji-icon.png')} />
+                        source={require('../../../assets/myongji-icon.png')} />
                 </View>
                 <View style={styles.text_container}>
                     <Text style={styles.text}>안전한 비밀번호를 만들어주세요.</Text>
@@ -219,6 +219,8 @@ export function Step2Screen({ route, navigation }) {
 }
 export function Step3Screen({route, navigation}) {
     const { email, password } = route.params;
+    const nicknameRegex = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,8}$/
+   
     const [progress, setProgress] = useState(0.66);
     useEffect(()=>{
         setProgress(1);
@@ -234,6 +236,8 @@ export function Step3Screen({route, navigation}) {
     const handleNicknameCheck = () => {
         if (nickname === ''){
             return Alert.alert('경고' , '닉네임을 입력해주세요.');
+        } else if (!nicknameRegex.test(nickname)){
+            return Alert.alert('경고', '닉네임은 특수문자 제외 2자 이상 8자 이하 입력해주세요.')
         }
         // **백엔드** 닉네임 DB에 중복확인
         // 중복 안하면
@@ -256,7 +260,11 @@ export function Step3Screen({route, navigation}) {
             nickname: nickname
         }
         console.log(userData);
-        navigation.navigate('Login');
+        
+        navigation.reset({
+            index: 0,
+            routes: [{name: 'Login'}], //(수정필요) 나중에 홈으로 변경
+        });
     }
     return (
         <DefaultLayout>
@@ -271,7 +279,7 @@ export function Step3Screen({route, navigation}) {
                 <View style={styles.icon_container}>
                     <Image
                     style={styles.myongji_icon}
-                    source={require('../../assets/myongji-icon.png')} />
+                    source={require('../../../assets/myongji-icon.png')} />
                 </View>
                 <View style={styles.nickname_container}>
                     <TextInput
