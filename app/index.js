@@ -1,12 +1,10 @@
 import { Link } from "expo-router";
 import { Text, StyleSheet, View } from "react-native";
+import Navigation from "./navigation";
 
 export default function Home(){
     return (
-        <View>
-            <Text>Hello World!!!!</Text>
-            <Link style={styles.text} href={'/screens/login'}>로그인 화면으로 이동</Link>
-        </View>
+      <Navigation/>
     )
 }
 
