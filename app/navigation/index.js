@@ -49,11 +49,11 @@ export default function Navigation(){
         <Stack.Navigator>
 
             {/* 로그인 된 유저 / 안 된 유저 화면 구분해야함 (수정해야함) */}
-            <Stack.Group>
+            <Stack.Group screenOptions={{headerStatusBarHeight: 7}}>
                 <Stack.Screen name="Login" component={Login}
-                options={{headerShown: false, backgroundColor: 'white'}} />
-                <Stack.Screen name="Step1" component={Step1Screen}
-                options={{backgroundColor: 'white', title: '회원가입', headerTitleAlign: 'center', headerShadowVisible: false}} />
+                options={{headerShown: false, cardStyle:{backgroundColor:'white'}}} />
+                <Stack.Screen name="Step1" component={Step1Screen} 
+                options={{cardStyle:{backgroundColor:'white'}, title: '회원가입', headerTitleAlign: 'center', headerShadowVisible: false}} />
                 <Stack.Screen name="Step2" component={Step2Screen}
                 options={signupOption} />
                 <Stack.Screen name="Step3" component={Step3Screen}
@@ -65,13 +65,13 @@ export default function Navigation(){
                 <Stack.Screen name="Post" component={Post}
                 options={{
                     cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forBottomSheetAndroid),
-                    headerStatusBarHeight: 7,
+                    // headerStatusBarHeight: 7,
                     headerTitleAlign: 'center', headerTitle: '글 작성',
                 }}/>
                 <Stack.Screen name="Notification" component={Notification}
                 options={{
                     cardStyleInterpolator: (Platform.OS==='ios' ? CardStyleInterpolators.forVerticalIOS : CardStyleInterpolators.forFadeFromBottomAndroid),
-                    headerStatusBarHeight: 7,
+                    // headerStatusBarHeight: 7,
                     headerTitleAlign: 'center', headerTitle: '알림',
                 }}/>
 
@@ -86,7 +86,7 @@ export default function Navigation(){
 }
 
 const signupOption = {
-    backgroundColor: 'white',
+    cardStyle:{backgroundColor:'white'},
     title: '회원가입',
     headerTitleAlign: 'center',
     headerShadowVisible: false,

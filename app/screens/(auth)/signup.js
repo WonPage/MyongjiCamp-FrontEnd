@@ -9,6 +9,17 @@ const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export function Step1Screen({navigation}) {
+    // const [keyboardHeight, setKeyboardHeight] = useState(0);
+    // useEffect(()=>{
+    //     const showKeyboard = Keyboard.addListener('keyboardDidShow', e => setKeyboardHeight(e.endCoordinates.height));
+    //     const hideKeyboard = Keyboard.addListener('keyboardDidHide', ()=> setKeyboardHeight(0));
+    //     return () => {
+    //         showKeyboard.remove();
+    //         hideKeyboard.remove();
+    //     }
+    // })
+    
+    
     const inputRef = useRef();
 
     const regex = /^[a-zA-Z0-9]+$/
@@ -255,7 +266,7 @@ export function Step3Screen({route, navigation}) {
         }
         //지금까지의 이메일, 비번, 닉네임을 DB에 보냄
         const userData = {
-            eamil: email,
+            email: email,
             password: password,
             nickname: nickname
         }
@@ -317,9 +328,7 @@ export function Step3Screen({route, navigation}) {
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        alignItems: 'stretch',
         marginHorizontal: 40,
-        // backgroundColor: 'red'
     },
     progress:{
         alignSelf: 'stretch',
