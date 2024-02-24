@@ -2,9 +2,9 @@ import { Link } from "expo-router";
 import { Text, StyleSheet, View } from "react-native";
 import Navigation from "./navigation";
 
-export default function Home(){
+export default function App(){
     return (
-      <Navigation/>
+        <Navigation/>
     )
 }
 

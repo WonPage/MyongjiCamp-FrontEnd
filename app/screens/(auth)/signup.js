@@ -129,7 +129,7 @@ export function Step1Screen({navigation}) {
                                 onPress={handleCodeSend}><Text style={styles.send_button_text}>인증번호 보내기</Text>
                             </TouchableOpacity>
                         </View>)}
-                    <View style={styles.buttom_blank}></View>
+                    <View style={styles.bottom_blank}></View>
                 </View>
             </>
         </DefaultLayout>
@@ -211,7 +211,7 @@ export function Step2Screen({ route, navigation }) {
                     activeOpacity={0.7}><Text style={styles.password_button_text}>확인</Text>
                 </TouchableOpacity>   
                 </View>
-                <View style={styles.buttom_blank}></View>
+                <View style={styles.bottom_blank}></View>
             </View>
             </>
         </DefaultLayout>
@@ -263,8 +263,9 @@ export function Step3Screen({route, navigation}) {
         
         navigation.reset({
             index: 0,
-            routes: [{name: 'Login'}], //(수정필요) 나중에 홈으로 변경
+            routes: [{name: 'Root'}], //(수정필요) 나중에 홈으로 변경
         });
+        
     }
     return (
         <DefaultLayout>
@@ -305,7 +306,7 @@ export function Step3Screen({route, navigation}) {
                         <Text style={styles.signup_button_text}>회원가입 완료</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.buttom_blank}></View>
+                <View style={styles.bottom_blank}></View>
             </View>
             </>
         </DefaultLayout>
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
     email_container: {flex:6, justifyContent: 'center', alignItems: 'center'},
     button_container: {flex: 3, justifyContent: 'center', alignItems: 'center'},
     top_blank:{flex: 5,},
-    buttom_blank:{flex: 8,},
+    bottom_blank:{flex: 8,},
     myongji_icon: {},
     text: {fontSize: 18},
     email_box: { 
