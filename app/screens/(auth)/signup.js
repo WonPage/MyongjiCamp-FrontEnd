@@ -267,7 +267,7 @@ export function Step3Screen({route, navigation}) {
         }
         //지금까지의 이메일, 비번, 닉네임을 DB에 보냄
         const userData = {
-            email: email,
+            email: `${email}@mju.ac.kr`,
             password: password,
             nickname: nickname,
             profileIcon: "1",
@@ -292,19 +292,19 @@ export function Step3Screen({route, navigation}) {
             //     console.log(result);
             //     return Alert.alert('경고', result.data);
             // }  
-            const res = await axios.post("http://192.168.0.133:8080/api/members", userData, {
+            const res = await axios.post(`${process.env.API_URL}/api/members`, userData, {
                 headers :{'Content-Type' : 'application/json '}
             })
             const result = res.data;
             console.log( result );
-            if ( result.ok ){
-                console.log(result.data);
+            if ( result.status === 200 ){
+                console.log('너 맞음', result);
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Root'}],
                 });
             } else {
-                console.log(result);
+                console.log('너 틀림' , result);
                 return Alert.alert('경고', result.data);
             }  
         } catch (error) {
