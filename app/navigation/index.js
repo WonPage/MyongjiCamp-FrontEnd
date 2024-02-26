@@ -19,7 +19,7 @@ const Tab = createBottomTabNavigator();
 function Root({navigation}){
     const [ unread, setUnread ] = useState(1);
     return(
-        <Tab.Navigator screenOptions={{ headerTitleStyle:{fontSize: 28}, headerStatusBarHeight:7, tabBarActiveTintColor: 'black', tabBarInactiveTintColor: '#999999',
+        <Tab.Navigator initialRouteName="Home" screenOptions={{ headerTitleStyle:{fontSize: 28}, headerStatusBarHeight:7, tabBarActiveTintColor: 'black', tabBarInactiveTintColor: '#999999',
             tabBarStyle:{ height: 70, paddingTop: 5, paddingBottom:3, }, tabBarLabelStyle: { marginBottom : 10 },
             headerRight : (props) => <NotificationIcon {...props} navigation={navigation}/>, unmountOnBlur: true}}>
             <Tab.Screen name="Home" component={Home}

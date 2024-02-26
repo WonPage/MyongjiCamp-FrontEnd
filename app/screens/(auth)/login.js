@@ -15,10 +15,9 @@ export default function Login({ navigation }) {
 
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
-        const fullEmail = `${emailPrefix}@mju.ac.kr`;
-
+        // const fullEmail = `@mju.ac.kr`;
                  try{
-                    const response = await fetch('http://192.168.0.133:8080/api/login',{
+                    const response = await fetch(`${process.env.API_URL}/api/login`,{
                         method: 'POST',
                         headers: {
                             'Content-Type' : 'application/json'
@@ -30,7 +29,7 @@ export default function Login({ navigation }) {
                     
                      if (result.ok) {
                          if (stayLoggedIn) {
-                             console.log(JSON.stringify({ email: fullEmail, password: password }))
+                             console.log(JSON.stringify({ email: `${emailPrefix}@mju.ac.kr`, password: password }))
 
                              await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
                          }

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
 import DefaultLayout from "../../layout/defaultlayout";
-import env from "react-native-dotenv";
 
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -282,11 +281,13 @@ export function Step3Screen({route, navigation}) {
         });
         const result = await res.json();
         if ( result.ok ){
+            console.log(result);
             navigation.reset({
                 index: 0,
                 routes: [{name: 'Root'}],
             });
         } else {
+            console.log(result);
             return Alert.alert('경고', result.data);
         }
 
