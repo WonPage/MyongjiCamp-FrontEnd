@@ -44,7 +44,6 @@ export default function Login({ navigation }) {
         catch (error) {
             console.log(error);
 
-            Alert.alert('오류', '네트워크 오류가 발생하였습니다.');
         };
     }
 
@@ -254,7 +253,6 @@ const styles = StyleSheet.create({
 
     ignore_down : {
         flex : 1,
-        backgroundColor:"red"
     }
 
 });
