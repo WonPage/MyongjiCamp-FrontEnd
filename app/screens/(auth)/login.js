@@ -15,29 +15,29 @@ export default function Login({ navigation }) {
 
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
-        // const fullEmail = `@mju.ac.kr`;
+        const fullEmail = `${emailPrefix}@mju.ac.kr`;
                  try{
                     const response = await fetch(`${process.env.API_URL}/api/login`,{
                         method: 'POST',
                         headers: {
                             'Content-Type' : 'application/json'
                         },
-                        body : JSON.stringify({email:fullEmail, password: password}),
+                        body : JSON.stringify({username:fullEmail, password: password}),
                     });
                     const result = await response.json(); //백으로 받은 json 응답
         
                     
                      if (result.ok) {
                          if (stayLoggedIn) {
-                             console.log(JSON.stringify({ email: `${emailPrefix}@mju.ac.kr`, password: password }))
+                             console.log(JSON.stringify({ username: fullEmail, password: password }))
 
-                             await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
+                             await AsyncStorage.setItem('key', JSON.stringify({ username: fullEmail, password: password }));
                          }
                          Alert.alert('로그인 성공', '나 확인용(지울거)');
                          // 메인 화면 열어야 됨
                      }
                      else {
-                         Alert.alert('로그인 실패', '이메일 또는 비밀번호가 잘못되었습니다.');
+                         Alert.alert('로그인 실패', result.data);
                          setPassword('');
                     }
                     

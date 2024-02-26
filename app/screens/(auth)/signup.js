@@ -272,26 +272,28 @@ export function Step3Screen({route, navigation}) {
             profileIcon: "1",
         }
         console.log(userData);
-        const res = await fetch("http://192.168.0.133:8080/api/members", {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify(userData)
-        });
-        const result = await res.json();
-        if ( result.ok ){
-            console.log(result);
-            navigation.reset({
-                index: 0,
-                routes: [{name: 'Root'}],
+        try {
+            const res = await fetch("http://192.168.0.133:8080/api/members", {
+                method: 'POST',
+                headers: {
+                    'Content-Type' : 'application/json',
+                },
+                body: JSON.stringify(userData)
             });
-        } else {
-            console.log(result);
-            return Alert.alert('경고', result.data);
-        }
-
-        
+            const result = await res.json();
+            if ( result.ok ){
+                console.log(result.data.message);
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Root'}],
+                });
+            } else {
+                console.log(result);
+                return Alert.alert('경고', result.data);
+            }  
+        } catch (error) {
+            console.log(error);
+        }        
     }
     return (
         <DefaultLayout>
