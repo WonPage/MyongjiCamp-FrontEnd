@@ -28,7 +28,8 @@ export default function Login({ navigation }) {
             const result = response.data;
             console.log(result);
             if (result.status === 200) {
-                console.log(result.data.message);
+                const storage = result.data.token;
+                console.log(storage)
                 Alert.alert('로그인 성공', result.data.message);
                 navigation.reset({
                     index: 0,
