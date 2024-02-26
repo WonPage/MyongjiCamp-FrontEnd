@@ -30,7 +30,7 @@ export default function Login({ navigation }) {
                 Alert.alert('로그인 성공', '환영합니다.');
             }
             else {
-                Alert.alert('로그인 실패', '이메일 또는 비밀번호가 잘못되었습니다.');
+                Alert.alert('로그인 실패', result.data);
                 setPassword('');
             }
 
