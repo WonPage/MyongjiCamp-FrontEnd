@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
 import DefaultLayout from "../../layout/defaultlayout";
+import env from "react-native-dotenv";
 
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -258,7 +259,7 @@ export function Step3Screen({route, navigation}) {
         // 중복 시
         // return Alert.alert('경고', '이미 존재하는 닉네임입니다.');
     }
-    const handleSignupComplete = () => {
+    const handleSignupComplete = async() => {
         // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
         if (!checked) {
             setNicknameWrong(true);
@@ -268,14 +269,27 @@ export function Step3Screen({route, navigation}) {
         const userData = {
             email: email,
             password: password,
-            nickname: nickname
+            nickname: nickname,
+            profileIcon: "1",
         }
         console.log(userData);
-        
-        navigation.reset({
-            index: 0,
-            routes: [{name: 'Root'}], //(수정필요) 나중에 홈으로 변경
+        const res = await fetch("http://192.168.0.133:8080/api/members", {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+            },
+            body: JSON.stringify(userData)
         });
+        const result = await res.json();
+        if ( result.ok ){
+            navigation.reset({
+                index: 0,
+                routes: [{name: 'Root'}],
+            });
+        } else {
+            return Alert.alert('경고', result.data);
+        }
+
         
     }
     return (
