@@ -16,28 +16,29 @@ export default function Login({ navigation }) {
 
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
-        const fullEmail = `${emailPrefix}@mju.ac.kr`;
+        const userData = {
+            username: `${emailPrefix}@mju.ac.kr`,
+            password: password,
+        }
         try {
-            const response = await axios.post('http://192.168.0.133:8080/api/login', {
-                username: fullEmail,
-                password: password,
-            }, {withCredentials : true});
-            // const result = await response.json(); //백으로 받은 json 응답
+            // const response = await axios.post(`${process.env.API_URL}/api/login`, userData,
+            const response = await axios.post(`${process.env.API_URL}/api/login`, userData,
+            { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }});
 
             const result = response.data;
-            console.log(result)
+            console.log(result);
             if (result.status === 200) {
-                console.log(result.data);
+                console.log(result.data.message);
+                Alert.alert('로그인 성공', result.data.message);
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Root'}],
                 });
             }
             else {
-                Alert.alert('로그인 실패', result.data);
+                Alert.alert('로그인 실패', result.data.message);
                 setPassword('');
             }
-
         }
         catch (error) {
             console.log(error);
