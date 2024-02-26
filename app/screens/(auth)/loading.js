@@ -18,7 +18,7 @@ export default function Loading({navigation}) {
             // console.log('세션 없어요');
             navigation.reset({
                 index: 0,
-                routes: [{name: 'Login'}],
+                routes: [{name: 'Root'}],
             });
         }
     }

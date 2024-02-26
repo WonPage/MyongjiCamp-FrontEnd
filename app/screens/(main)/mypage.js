@@ -1,27 +1,99 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import DefaultLayout from "../../layout/defaultlayout";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function MyPage({navigation}) {
+    const page_list = [
+        {page:'Notice', title:'공지사항'},
+        {page:'FAQ', title:'FAQ'},
+        {page:'Event', title:'이벤트'},
+        {page:'Account', title: '계정관리'},
+        {page:'Information', title:'이용안내'},
+        {page:'NotifySetting', title:'알림설정'},
+        {page:'Logout', title:'로그아웃'}
+    ]
     return(
-        <DefaultLayout>
-            <View style={styles.container}>
-                <StatusBar style="auto"/>
-                <TouchableOpacity onPress={async()=>{
-                    if (AsyncStorage) { await AsyncStorage.clear(); }
-                    navigation.reset({index:0, routes: [{name: 'Login'}]});
-                }}><Text>로그아웃</Text>
-                </TouchableOpacity>
+        <View style={[styles.container]}>
+            <StatusBar style="auto"/>
+            <View style={styles.profile_container}>
+                <View style={{flex: 1}}>
+                    <View style={{backgroundColor:'gray', width:'80%', height:'50%', borderRadius: 50}}><Text>이미지</Text></View>
+                </View>
+                <View style={{flex: 2}}>
+                    <Text style={{fontSize: 30}}>닉네임</Text>
+                    <Text style={{fontSize: 17}}>이메일 주소</Text>
+                </View>
             </View>
-        </DefaultLayout>
+            <View style={styles.resume_container}>
+                <View style={{flex: 1}}></View>
+                <View style={{flex: 5}}>
+                <TouchableOpacity style={styles.resume_button}>
+                    <Text style={{fontSize: 20}}>이력서 관리</Text>
+                </TouchableOpacity>
+                </View>
+                <View style={{flex: 1}}></View>
+            </View>
+            <View style={styles.pages_container}>
+                <FlatList
+                style={{marginTop: 22}}
+                contentContainerStyle= {{paddingVertical: 10, paddingHorizontal:34, alignItems: 'flex-start', paddingBottom:-7}}
+                data={page_list}
+                renderItem={({item}) => <Item title={item.title} page={item.page} navigation={navigation}/>}
+                />
+            </View>
+        </View>
     )
 }
+const Item = ({title, page, navigation}) => {
+    if (page === 'Logout') {
+        return (
+            <TouchableOpacity style={styles.page_item} onPress={async()=>{
+                if (AsyncStorage.token){
+                    AsyncStorage.clear();
+                }
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Login'}],
+                });
+            }}>
+                <Text style={styles.page_title}>{title}</Text>
+            </TouchableOpacity>
+        )
+    }
+
+    return (
+        <TouchableOpacity style={styles.page_item} onPress={()=>{navigation.navigate(page)}}>
+            <Text style={styles.page_title}>{title}</Text>
+        </TouchableOpacity>
+    )
+}
+
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    }
+    },
+    profile_container:{
+        flex: 2.5,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    resume_container:{
+        flex: 0.8,
+        flexDirection: 'row',
+    },
+    resume_button:{
+        width:'100%', height:'100%', borderRadius: 10,
+        backgroundColor: 'skyblue',
+        justifyContent: 'center', alignItems:'center',
+    },
+    pages_container:{
+        flex: 4,
+    },
+    page_item :{ marginBottom: 27,},
+    page_title: {fontSize: 23}
 });

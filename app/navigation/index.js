@@ -12,6 +12,13 @@ import Notification, {NotificationIcon} from "../screens/(main)/notification.js"
 import { Platform, Text, TouchableOpacity } from "react-native";
 import { AntDesign, Feather, FontAwesome5, Octicons } from "@expo/vector-icons";
 import Loading from "../screens/(auth)/loading.js";
+import Notice from "../screens/other/notice.js";
+import FAQ from "../screens/other/faq.js";
+import Event from "../screens/other/event.js";
+import Account from "../screens/other/account.js";
+import Information from "../screens/other/information.js";
+import NotifySetting from "../screens/other/notifysetting.js";
+import Logout from "../screens/other/logout.js";
 
 
 const Stack = createStackNavigator();
@@ -78,6 +85,12 @@ export default function Navigation(){
                     headerTitleAlign: 'center', headerTitle: '알림',
                 }}/>
 
+                <Stack.Screen name="Notice" component={Notice} options={{title:'공지사항'}}/>
+                <Stack.Screen name="FAQ" component={FAQ}/>
+                <Stack.Screen name="Event" component={Event} options={{title:'이벤트'}}/>
+                <Stack.Screen name="Account" component={Account} options={{title:'계정관리'}}/>
+                <Stack.Screen name="Information" component={Information} options={{title:'이용안내'}}/>
+                <Stack.Screen name="NotifySetting" component={NotifySetting} options={{title:'알림설정'}}/>
             </Stack.Group>
 
             {/* 공통 Modal 창 (팝업창) */}
