@@ -296,7 +296,6 @@ export function Step3Screen({route, navigation}) {
                 headers :{'Content-Type' : 'application/json '}
             })
             const result = res.data;
-            console.log( result );
             if ( result.status === 200 ){
                 console.log('너 맞음', result);
                 navigation.reset({
