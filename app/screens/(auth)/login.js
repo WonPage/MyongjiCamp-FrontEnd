@@ -5,6 +5,7 @@ import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, Sty
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import DefaultLayout from "../../layout/defaultlayout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios, { Axios, AxiosError } from 'axios';
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
@@ -15,25 +16,28 @@ export default function Login({ navigation }) {
 
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
-        // const fullEmail = `@mju.ac.kr`;
+        const fullEmail = `${emailPrefix}@mju.ac.kr`;
+
                  try{
-                    const response = await fetch(`${process.env.API_URL}/api/login`,{
-                        method: 'POST',
-                        headers: {
-                            'Content-Type' : 'application/json'
-                        },
-                        body : JSON.stringify({email:fullEmail, password: password}),
+                    const response = await axios.post('http://192.168.0.133:8080/api/login',{
+                        email : fullEmail,
+                        password: password,
+                        // method: 'POST',
+                        // headers: {
+                        //     'Content-Type' : 'application/json'
+                        // },
+                        // body : JSON.stringify({email:fullEmail, password: password}),
                     });
-                    const result = await response.json(); //백으로 받은 json 응답
+                    // const result = await response.json(); //백으로 받은 json 응답
         
                     
-                     if (result.ok) {
-                         if (stayLoggedIn) {
-                             console.log(JSON.stringify({ email: `${emailPrefix}@mju.ac.kr`, password: password }))
+                     if (response.data.success) {
+                        //  if (stayLoggedIn) {
+                        //      console.log(JSON.stringify({ email: fullEmail, password: password }))
 
-                             await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
-                         }
-                         Alert.alert('로그인 성공', '나 확인용(지울거)');
+                        //      await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
+                        //  }
+                        //  Alert.alert('로그인 성공', '나 확인용(지울거)');
                          // 메인 화면 열어야 됨
                      }
                      else {
@@ -47,6 +51,7 @@ export default function Login({ navigation }) {
 
                 }
                 catch(error){
+                    
                     Alert.alert('오류','네트워크 오류가 발생하였습니다.');
                 }; 
     }
