@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
 import DefaultLayout from "../../layout/defaultlayout";
+import axios from "axios";
 
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -273,16 +274,31 @@ export function Step3Screen({route, navigation}) {
         }
         console.log(userData);
         try {
-            const res = await fetch("http://192.168.0.133:8080/api/members", {
-                method: 'POST',
-                headers: {
-                    'Content-Type' : 'application/json',
-                },
-                body: JSON.stringify(userData)
-            });
-            const result = await res.json();
+            // const res = await fetch("http://192.168.0.133:8080/api/members", {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type' : 'application/json',
+            //     },
+            //     body: JSON.stringify(userData)
+            // });
+            // const result = await res.json();
+            // if ( result.ok ){
+            //     console.log(result.data.message);
+            //     navigation.reset({
+            //         index: 0,
+            //         routes: [{name: 'Root'}],
+            //     });
+            // } else {
+            //     console.log(result);
+            //     return Alert.alert('경고', result.data);
+            // }  
+            const res = await axios.post("http://192.168.0.133:8080/api/members", userData, {
+                headers :{'Content-Type' : 'application/json '}
+            })
+            const result = res.data;
+            console.log( result );
             if ( result.ok ){
-                console.log(result.data.message);
+                console.log(result.data);
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Root'}],
