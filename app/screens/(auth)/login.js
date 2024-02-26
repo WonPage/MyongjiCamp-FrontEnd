@@ -16,10 +16,9 @@ export default function Login({ navigation }) {
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
         const fullEmail = `${emailPrefix}@mju.ac.kr`;
-        // console.log(JSON.stringify({ email: fullEmail, password: password }))
 
                  try{
-                    const response = await fetch('api_url_써야돼',{
+                    const response = await fetch('http://192.168.0.133:8080/api/login',{
                         method: 'POST',
                         headers: {
                             'Content-Type' : 'application/json'
@@ -28,16 +27,19 @@ export default function Login({ navigation }) {
                     });
                     const result = await response.json(); //백으로 받은 json 응답
         
-                    if(result.ok){
-                        if(stayLoggedIn){
-                            await AsyncStorage.setItem('key',JSON.stringify({email:fullEmail, password: password}));
-                        }
-                        Alert.alert('로그인 성공', '나 확인용(지울거)');
-                        // 메인 화면 열어야 됨
-                    }
-                    else{
-                        Alert.alert('로그인 실패','이메일 또는 비밀번호가 잘못되었습니다.');
-                        setPassword('');
+                    
+                     if (result.ok) {
+                         if (stayLoggedIn) {
+                             console.log(JSON.stringify({ email: fullEmail, password: password }))
+
+                             await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
+                         }
+                         Alert.alert('로그인 성공', '나 확인용(지울거)');
+                         // 메인 화면 열어야 됨
+                     }
+                     else {
+                         Alert.alert('로그인 실패', '이메일 또는 비밀번호가 잘못되었습니다.');
+                         setPassword('');
                     }
                     
                     
@@ -51,6 +53,7 @@ export default function Login({ navigation }) {
     }
 
     // 비밀번호 찾기 버튼 눌렀을 때
+
     const handleFindPassword = () => {
         Alert.alert('비밀번호를 찾습니다');
     }
