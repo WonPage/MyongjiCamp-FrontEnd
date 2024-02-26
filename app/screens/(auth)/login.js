@@ -21,13 +21,17 @@ export default function Login({ navigation }) {
             const response = await axios.post('http://192.168.0.133:8080/api/login', {
                 username: fullEmail,
                 password: password,
-            }, { headers: { 'Content-Type': 'application/json' } });
+            }, {withCredentials : true});
             // const result = await response.json(); //백으로 받은 json 응답
 
             const result = response.data;
+            console.log(result)
             if (result.status === 200) {
                 console.log(result.data);
-                Alert.alert('로그인 성공', '환영합니다.');
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Root'}],
+                });
             }
             else {
                 Alert.alert('로그인 실패', result.data);
@@ -38,7 +42,6 @@ export default function Login({ navigation }) {
         catch (error) {
             console.log(error);
 
-            Alert.alert('오류', '네트워크 오류가 발생하였습니다.');
         };
     }
 
@@ -248,7 +251,6 @@ const styles = StyleSheet.create({
 
     ignore_down : {
         flex : 1,
-        backgroundColor:"red"
     }
 
 });
