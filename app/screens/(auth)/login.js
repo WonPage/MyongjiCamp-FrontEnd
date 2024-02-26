@@ -17,52 +17,27 @@ export default function Login({ navigation }) {
     // 로그인 버튼 눌렀을 때
     const handleConfirm = async () => {
         const fullEmail = `${emailPrefix}@mju.ac.kr`;
-
         try {
-            console.log(fullEmail, password);
             const response = await axios.post('http://192.168.0.133:8080/api/login', {
                 username: fullEmail,
                 password: password,
-            }, {
-                headers: { 'Content-Type' : 'application/json ','Authorization' :'token'}
-            });
-            // method: 'POST',
-            // headers: {
-            //     'Content-Type' : 'application/json'
-            // },
-            // body : JSON.stringify({email:fullEmail, password: password}),
-            // const response = await fetch(`${process.env.API_URL}/api/login`,{
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type' : 'application/json'
-            //     },
-            //     body : JSON.stringify({username:fullEmail, password: password}),
+            }, { headers: { 'Content-Type': 'application/json' } });
             // const result = await response.json(); //백으로 받은 json 응답
-            console.log(response);
-            if (response.data.success) {
-                //  if (stayLoggedIn) {
-                //      console.log(JSON.stringify({ email: fullEmail, password: password }))
-                if (result.ok) {
-                    if (stayLoggedIn) {
-                        console.log(JSON.stringify({ username: fullEmail, password: password }))
 
-                        //      await AsyncStorage.setItem('key', JSON.stringify({ email: fullEmail, password: password }));
-                        //  }
-                        //  Alert.alert('로그인 성공', '나 확인용(지울거)');
-                        await AsyncStorage.setItem('key', JSON.stringify({ username: fullEmail, password: password }));
-                    }
-                    Alert.alert('로그인 성공', '나 확인용(지울거)');
-                    // 메인 화면 열어야 됨
-                }
-                else {
-                    Alert.alert('로그인 실패', result.data);
-                    setPassword('');
-                }
-
+            const result = response.data;
+            if (result.status === 200) {
+                console.log(result.data);
+                Alert.alert('로그인 성공', '환영합니다.');
             }
+            else {
+                Alert.alert('로그인 실패', '이메일 또는 비밀번호가 잘못되었습니다.');
+                setPassword('');
+            }
+
         }
         catch (error) {
             console.log(error);
+
             Alert.alert('오류', '네트워크 오류가 발생하였습니다.');
         };
     }
