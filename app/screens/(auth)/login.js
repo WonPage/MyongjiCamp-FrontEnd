@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from "expo-router";
 
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, View, TextInput, Button, Text, Image, Switch, Alert, TouchableOpacity } from "react-native";
@@ -21,15 +21,20 @@ export default function Login({ navigation }) {
             password: password,
         }
         try {
-            // const response = await axios.post(`${process.env.API_URL}/api/login`, userData,
             const response = await axios.post(`${process.env.API_URL}/api/login`, userData,
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }});
 
             const result = response.data;
-            console.log(result);
             if (result.status === 200) {
-                const storage = result.data.token;
-                console.log(storage)
+
+                // 비동기저장소에 토큰, 세션 정보 저장
+                const token = result.data.token;
+                const loginData = {
+                    token : token,
+                    session : (stayLoggedIn ? true : undefined),
+                }
+
+                await AsyncStorage.setItem('token', JSON.stringify(loginData));
                 Alert.alert('로그인 성공', result.data.message);
                 navigation.reset({
                     index: 0,
@@ -97,6 +102,7 @@ export default function Login({ navigation }) {
                                 }}
                                 fillColor='#008FD5'
                                 text="로그인 유지"
+                                isChecked={stayLoggedIn}
                                 onPress={setStayLoggedIn}
                             />
                         </View>

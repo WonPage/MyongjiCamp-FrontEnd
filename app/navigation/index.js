@@ -11,6 +11,7 @@ import MyPage from "../screens/(main)/mypage.js";
 import Notification, {NotificationIcon} from "../screens/(main)/notification.js";
 import { Platform, Text, TouchableOpacity } from "react-native";
 import { AntDesign, Feather, FontAwesome5, Octicons } from "@expo/vector-icons";
+import Loading from "../screens/(auth)/loading.js";
 
 
 const Stack = createStackNavigator();
@@ -50,6 +51,8 @@ export default function Navigation(){
 
             {/* 로그인 된 유저 / 안 된 유저 화면 구분해야함 (수정해야함) */}
             <Stack.Group screenOptions={{headerStatusBarHeight: 7}}>
+                <Stack.Screen name="Loading" component={Loading}
+                options={{headerShown: false, cardStyle:{backgroundColor:'white'}}}/>
                 <Stack.Screen name="Login" component={Login}
                 options={{headerShown: false, cardStyle:{backgroundColor:'white'}}} />
                 <Stack.Screen name="Step1" component={Step1Screen} 

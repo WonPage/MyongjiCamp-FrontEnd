@@ -38,6 +38,43 @@ export function Step1Screen({navigation}) {
         if (isWrong){}
     }, [code, isWrong]);
 
+    // 인증번호 타이머
+    const [minutes, setMinutes] = useState(2);
+    const [seconds, setSeconds] = useState(0);
+    const [isActive, setIsActive] = useState(false);
+    const [isExpire, setIsExpire] = useState(false);
+    function resetTimer() {
+        setMinutes(2);
+        setSeconds(1);
+        setIsExpire(false);
+        setIsActive(true);
+    }
+    useEffect(() => {
+        let interval = null;
+        if (isActive) {
+          interval = setInterval(() => {
+            if (seconds > 0) {
+              setSeconds(seconds - 1);
+            }
+            if (seconds === 0) {
+              if (minutes === 0) {
+                setIsExpire(true);
+                setIsActive(false);
+                setCode('');
+                clearInterval(interval);
+              } else {
+                setMinutes(minutes - 1);
+                setSeconds(59);
+              }
+            } 
+          }, 1000);
+        } 
+        return () => {
+            clearInterval(interval);
+        }
+      }, [isActive, seconds]);
+    
+
     const handleTextClick = () => {
         inputRef.current.focus();
     }
@@ -51,13 +88,18 @@ export function Step1Screen({navigation}) {
         // **백엔드** 인증코드 보내기
         //성공 시
         setIsCodeSent(true);
+        // setMinutes(2);
+        // setSeconds(0);
+        setIsActive(true);
+        Alert.alert('안내', '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
         //실패 시
         //return Alert.alert('오류', '전송에 실패하였습니다.');
     }
     const handleResendCode = () => {
         setCode('');
         //이메일 인증번호 재전송 코드
-        return Alert.alert('안내', '인증번호를 재전송했습니다.');
+        resetTimer();
+        Alert.alert('안내', '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
     }
     const handleVerifyCode = () => {
         // **백엔드** 코드가 우리가 보낸값과 일치하는지 확인
@@ -114,8 +156,8 @@ export function Step1Screen({navigation}) {
                     {isCodeSent ?
                         (<>
                             <View style={styles.code_container}>
+                                <View style={isWrong ? styles.code_input_wrong : styles.code_input}>
                                 <TextInput
-                                    style={isWrong ? styles.code_input_wrong : styles.code_input}
                                     onChangeText={setCode}
                                     value={code}
                                     maxLength={4}
@@ -123,6 +165,10 @@ export function Step1Screen({navigation}) {
                                     placeholder={isWrong? "다시 입력해주세요." : "인증코드"}
                                     placeholderTextColor={isWrong ? 'red' : undefined}
                                     />
+                                <Text style={{flex: 1, textAlign: 'right', fontSize:13, color:'gray'}}>
+                                    { isExpire ? "시간만료" : `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`}
+                                </Text>
+                                </View>
                                 <TouchableOpacity style={styles.code_resend}
                                 onPress={handleResendCode}
                                 activeOpacity={0.7}><Text style={styles.resend_text}>재전송</Text></TouchableOpacity>
@@ -300,7 +346,7 @@ export function Step3Screen({route, navigation}) {
                 console.log('너 맞음', result);
                 navigation.reset({
                     index: 0,
-                    routes: [{name: 'Root'}],
+                    routes: [{name: 'Login'}],
                 });
             } else {
                 console.log('너 틀림' , result);
@@ -408,6 +454,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderRadius: 10,
         marginRight: 30,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     code_input_wrong:{
         flex:1,
@@ -416,6 +464,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         borderRadius: 10,
         marginRight: 30,
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     code_resend:{
         width: 70,
