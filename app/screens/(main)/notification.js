@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
-import DefaultLayout from "../../layout/defaultlayout";
+import DefaultLayout from "../../layout/keyboardlayout";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";

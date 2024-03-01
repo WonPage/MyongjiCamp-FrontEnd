@@ -3,23 +3,13 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Dimensions, Platform, TouchableOpacity, Animated } from "react-native";
 import * as Progress from 'react-native-progress';
-import DefaultLayout from "../../layout/defaultlayout";
+import DefaultLayout from "../../layout/keyboardlayout";
 import axios from "axios";
 
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
 
 export function Step1Screen({navigation}) {
-    // const [keyboardHeight, setKeyboardHeight] = useState(0);
-    // useEffect(()=>{
-    //     const showKeyboard = Keyboard.addListener('keyboardDidShow', e => setKeyboardHeight(e.endCoordinates.height));
-    //     const hideKeyboard = Keyboard.addListener('keyboardDidHide', ()=> setKeyboardHeight(0));
-    //     return () => {
-    //         showKeyboard.remove();
-    //         hideKeyboard.remove();
-    //     }
-    // })
-    
     
     const inputRef = useRef();
 
@@ -80,18 +70,19 @@ export function Step1Screen({navigation}) {
     }
     const handleCodeSend = () => {
         if (email === '') { // 이메일 빈칸인지 아닌지 확인
-            return Alert.alert('경고', '이메일을 입력해주세요.');
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '이메일을 입력해주세요.'});
+            // return Alert.alert('경고', '이메일을 입력해주세요.');
         }
         if (!regex.test(email)) { // 한글, 특수문자 방지
-            return Alert.alert('경고', '영문, 숫자만 입력 가능합니다.')
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '영문, 숫자만 입력 가능합니다.'});
+            // return Alert.alert('경고', '영문, 숫자만 입력 가능합니다.')
         }
         // **백엔드** 인증코드 보내기
         //성공 시
         setIsCodeSent(true);
-        // setMinutes(2);
-        // setSeconds(0);
         setIsActive(true);
-        Alert.alert('안내', '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
+        navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요'});
+        // Alert.alert('안내', '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
         //실패 시
         //return Alert.alert('오류', '전송에 실패하였습니다.');
     }
@@ -99,7 +90,8 @@ export function Step1Screen({navigation}) {
         setCode('');
         //이메일 인증번호 재전송 코드
         resetTimer();
-        Alert.alert('안내', '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
+        navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.'});
+        // Alert.alert('안내', '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
     }
     const handleVerifyCode = () => {
         // **백엔드** 코드가 우리가 보낸값과 일치하는지 확인
@@ -112,6 +104,7 @@ export function Step1Screen({navigation}) {
         else {
             setCode('');
             setIsWrong(true);
+            navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '인증번호가 일치하지 않습니다.'});
             // return Alert.alert('경고', '인증번호가 일치하지 않습니다.');
         }
 
@@ -207,19 +200,23 @@ export function Step2Screen({ route, navigation }) {
     const handlePasswordCheck = () => {
         if (password.length === 0) {
             setIsPasswordWrong(true);
-            return Alert.alert('경고', '비밀번호를 입력해주세요.');
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '비밀번호를 입력해주세요.'});
+            // return Alert.alert('경고', '비밀번호를 입력해주세요.');
         } else if (!passwordRegExp.test(password)) {
             setIsPasswordWrong(true);
             setPasswordCheck('');
-            return Alert.alert('경고', '안전하지 않은 비밀번호입니다.\n\n영문, 숫자, 특수문자 포함 8글자 이상의 비밀번호를 설정해주세요.')
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '안전하지 않은 비밀번호입니다.\n\n영문, 숫자, 특수문자 포함 8글자 이상의 비밀번호를 설정해주세요.'});
+            // return Alert.alert('경고', '안전하지 않은 비밀번호입니다.\n\n영문, 숫자, 특수문자 포함 8글자 이상의 비밀번호를 설정해주세요.')
         } else if (passwordCheck.length === 0) {
             setIsPasswordWrong(false);
             setIsPasswordCheckWrong(true);
-            return Alert.alert('경고', '비밀번호 재입력을 입력해주세요.')
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '비밀번호 재입력을 입력해주세요.'});
+            // return Alert.alert('경고', '비밀번호 재입력을 입력해주세요.')
         } else if (password !== passwordCheck) {
             setIsPasswordWrong(false);
             setIsPasswordCheckWrong(true);
-            return Alert.alert('경고', '동일한 비밀번호를 입력해주세요.')
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '동일한 비밀번호를 입력해주세요.'});
+            // return Alert.alert('경고', '동일한 비밀번호를 입력해주세요.')
         }
         // 모든 검증을 마쳤으면 비밀번호를 저장 (**백엔드**) 하고 다음단계로 이동.
         navigation.navigate('Step3', {
@@ -293,23 +290,27 @@ export function Step3Screen({route, navigation}) {
 
     const handleNicknameCheck = () => {
         if (nickname === ''){
-            return Alert.alert('경고' , '닉네임을 입력해주세요.');
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '닉네임을 입력해주세요.'});
+            // return Alert.alert('경고' , '닉네임을 입력해주세요.');
         } else if (!nicknameRegex.test(nickname)){
-            return Alert.alert('경고', '닉네임은 특수문자 제외 2자 이상 8자 이하 입력해주세요.')
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '닉네임은 특수문자 제외 2자 이상 8자 이하 입력해주세요.'});
+            // return Alert.alert('경고', '닉네임은 특수문자 제외 2자 이상 8자 이하 입력해주세요.')
         }
         // **백엔드** 닉네임 DB에 중복확인
         // 중복 안하면
-        Alert.alert('안내', '사용 가능한 닉네임입니다.');
+        navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '사용 가능한 닉네임입니다.'});
+        // Alert.alert('안내', '사용 가능한 닉네임입니다.');
         setNicknameWrong(false);
         setChecked(true);
         // 중복 시
         // return Alert.alert('경고', '이미 존재하는 닉네임입니다.');
     }
-    const handleSignupComplete = async() => {
+    const handleSignupComplete = () => {
         // 중복확인이 true가 되면 DB에 지금까지의 이메일, PW, 닉네임을 넘기고 회원가입 완료.. => 홈 화면으로 이동
         if (!checked) {
             setNicknameWrong(true);
-            return Alert.alert('경고', '닉네임 중복검사를 해주세요.');
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '닉네임 중복검사를 해주세요.'});
+            // return Alert.alert('경고', '닉네임 중복검사를 해주세요.');
         }
         //지금까지의 이메일, 비번, 닉네임을 DB에 보냄
         const userData = {
@@ -319,42 +320,25 @@ export function Step3Screen({route, navigation}) {
             profileIcon: "1",
         }
         console.log(userData);
-        try {
-            // const res = await fetch("http://192.168.0.133:8080/api/members", {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type' : 'application/json',
-            //     },
-            //     body: JSON.stringify(userData)
-            // });
-            // const result = await res.json();
-            // if ( result.ok ){
-            //     console.log(result.data.message);
-            //     navigation.reset({
-            //         index: 0,
-            //         routes: [{name: 'Root'}],
-            //     });
-            // } else {
-            //     console.log(result);
-            //     return Alert.alert('경고', result.data);
-            // }  
-            const res = await axios.post(`${process.env.API_URL}/api/members`, userData, {
-                headers :{'Content-Type' : 'application/json '}
-            })
+        axios.post(`${process.env.API_URL}/api/members`,
+        userData,
+        { headers: { 'Content-Type': 'application/json'}})
+        .then(res => {
             const result = res.data;
-            if ( result.status === 200 ){
-                console.log('너 맞음', result);
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'Login'}],
-                });
-            } else {
-                console.log('너 틀림' , result);
-                return Alert.alert('경고', result.data);
-            }  
-        } catch (error) {
-            console.log(error);
-        }        
+            console.log('너 맞음', result);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            })
+            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '회원가입에 성공했습니다.'});
+            // Alert.alert('안내', '회원가입에 성공했습니다.');
+        })
+        .catch(error => {
+            const result = error.response.data;
+            console.log('너 틀림', result);
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: result.data});
+            // return Alert.alert('경고', result.data);
+        })
     }
     return (
         <DefaultLayout>

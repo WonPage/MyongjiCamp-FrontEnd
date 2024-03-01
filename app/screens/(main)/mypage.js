@@ -1,11 +1,16 @@
 import { Image, StyleSheet, Text, View } from "react-native";
-import DefaultLayout from "../../layout/defaultlayout";
+import DefaultLayout from "../../layout/keyboardlayout";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useEffect } from "react";
+import AuthLayout from "../../layout/authlayout";
 
-export default function MyPage({navigation}) {
+export default function MyPage({navigation, route}) {
+    useEffect(()=>{
+
+    },[])
     const page_list = [
         {page:'Notice', title:'공지사항'},
         {page:'FAQ', title:'FAQ'},
@@ -16,6 +21,7 @@ export default function MyPage({navigation}) {
         {page:'Logout', title:'로그아웃'}
     ]
     return(
+        <AuthLayout navigation={navigation} route={route}>
         <View style={[styles.container]}>
             <StatusBar style="auto"/>
             <View style={styles.profile_container}>
@@ -30,7 +36,7 @@ export default function MyPage({navigation}) {
             <View style={styles.resume_container}>
                 <View style={{flex: 1}}></View>
                 <View style={{flex: 5}}>
-                <TouchableOpacity style={styles.resume_button}>
+                <TouchableOpacity style={styles.resume_button} onPress={()=>{navigation.navigate('Resume')}}>
                     <Text style={{fontSize: 20}}>이력서 관리</Text>
                 </TouchableOpacity>
                 </View>
@@ -45,15 +51,14 @@ export default function MyPage({navigation}) {
                 />
             </View>
         </View>
+        </AuthLayout>
     )
 }
 const Item = ({title, page, navigation}) => {
     if (page === 'Logout') {
         return (
             <TouchableOpacity style={styles.page_item} onPress={async()=>{
-                if (AsyncStorage.token){
-                    AsyncStorage.clear();
-                }
+                await AsyncStorage.clear().then(console.log('로그아웃 완료.'));
                 navigation.reset({
                     index: 0,
                     routes: [{name: 'Login'}],

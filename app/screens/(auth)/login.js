@@ -1,59 +1,65 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from "expo-router";
 
 import { TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, View, TextInput, Button, Text, Image, Switch, Alert, TouchableOpacity } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import DefaultLayout from "../../layout/defaultlayout";
+import DefaultLayout from "../../layout/keyboardlayout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { Axios, AxiosError } from 'axios';
+import AuthLayout from '../../layout/authlayout';
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
-export default function Login({ navigation }) {
+export default function Login({ navigation, route }) {
+    const inputRef = useRef();
+
+    const handleTextClick = () => {
+        inputRef.current.focus();
+    }
+    
     const [emailPrefix, setEmailPrefix] = useState('');
     const [password, setPassword] = useState('');
     const [stayLoggedIn, setStayLoggedIn] = useState(false);
+    const [loginDisable, setLoginDisable] = useState(false);
 
     // 로그인 버튼 눌렀을 때
-    const handleConfirm = async () => {
+    const handleConfirm = () => {
+        setLoginDisable(true);
         const userData = {
             username: `${emailPrefix}@mju.ac.kr`,
             password: password,
         }
-        try {
-            const response = await axios.post(`${process.env.API_URL}/api/login`, userData,
-            { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }});
-
-            const result = response.data;
-            if (result.status === 200) {
-
-                // 비동기저장소에 토큰, 세션 정보 저장
-                const token = result.data.token;
-                const loginData = {
-                    token : token,
-                    session : (stayLoggedIn ? true : undefined),
-                }
-
-                await AsyncStorage.setItem('token', JSON.stringify(loginData));
-                Alert.alert('로그인 성공', result.data.message);
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'Root'}],
-                });
+        
+        axios.post(`${process.env.API_URL}/api/login`,
+        userData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }})
+        //성공 핸들링
+        .then(async(res) => {
+            const result = res.data;
+            // 비동기저장소에 토큰, 세션 정보 저장
+            const token = result.data.token;
+            const loginData = {
+                token: token,
+                session: (stayLoggedIn ? true : undefined),
             }
-            else {
-                Alert.alert('로그인 실패', result.data.message);
-                setPassword('');
-            }
-        }
-        catch (error) {
-            console.log(error);
-
-        };
+            await AsyncStorage.setItem('token', JSON.stringify(loginData));
+            // Alert.alert('로그인 성공', result.data.message);
+            navigation.reset({
+                index: 0,
+                routes: [{name: 'Root'}],
+            });
+            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data.message});
+        })
+        //에러 핸들링
+        .catch (error => {
+            const result = error.response.data;
+            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
+            // Alert.alert('로그인 실패', result.data);
+            setPassword('');
+        })
+        .then (setLoginDisable(false))
     }
 
     // 비밀번호 찾기 버튼 눌렀을 때
-
     const handleFindPassword = () => {
         Alert.alert('비밀번호를 찾습니다');
     }
@@ -65,6 +71,7 @@ export default function Login({ navigation }) {
 
     //이메일 콘솔에 뭐라고 찍히는지 확인하기
     return (
+        <AuthLayout navigation={navigation} route={route}>
         <DefaultLayout>
             <View style={styles.container}>
                 <View style={styles.container_width}>
@@ -76,6 +83,7 @@ export default function Login({ navigation }) {
                     <View style={styles.input}>
                         <View style={styles.input_box}>
                             <TextInput
+                                ref={inputRef}
                                 style={styles.input_email_txt}
                                 placeholder="이메일"
                                 value={emailPrefix}
@@ -83,7 +91,8 @@ export default function Login({ navigation }) {
                                 autoCapitalize='none'
                                 maxLength={20} // @앞의 최대 글자 수 30자
                             />
-                            <Text style={styles.input_email_rear}>@mju.ac.kr</Text>
+                            <Text style={styles.input_email_rear}
+                            onPress={handleTextClick}>@mju.ac.kr</Text>
                         </View>
                         <TextInput
                             style={styles.input_password}
@@ -111,7 +120,8 @@ export default function Login({ navigation }) {
                     <View style={styles.confirm}>
                         <TouchableOpacity
                             style={styles.confirm_button}
-                            onPress={handleConfirm}>
+                            onPress={handleConfirm}
+                            disabled={loginDisable}>
                             <Text style={styles.confirm_button_txt}>로그인</Text>
                         </TouchableOpacity>
                     </View>
@@ -143,6 +153,7 @@ export default function Login({ navigation }) {
                 </View>
             </View>
         </DefaultLayout>
+        </AuthLayout>
     );
 }
 const styles = StyleSheet.create({
