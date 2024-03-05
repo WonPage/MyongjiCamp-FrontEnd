@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput } from "react-native";
 import { StatusBar, StyleSheet } from "react-native";
 import { View } from "react-native";
+import { useComment } from "../../hook/usecomment";
+const API_URL = process.env.API_URL;
 
 export default function PostDetail({ navigation, route }) {
 
@@ -12,7 +14,7 @@ export default function PostDetail({ navigation, route }) {
         <View style={styles.container}>
             <StatusBar style="auto" />
             <Detail/>
-            <Comment boardId={route.params.boardId}/>
+            <Comment/>
         </View>
         </ScrollView>
     )
@@ -24,55 +26,34 @@ function Detail() {
     )
 }
 
-function Comment({boardId}) {
+function Comment() {
     const [comment, setComment] = useState('');
     const [commentList, setCommentList] = useState();
-    const writeComment = async () => {
-        const token = JSON.parse(await AsyncStorage.getItem('token'));
-        axios.post(`${process.env.API_URL}/api/auth/recruit/${boardId}/comment`, {
-            content: comment,
-            cdepth: 0
-        }, { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token.token}` } })
-            .then(res => {
-                const result = res.data;
-                // console.log('성공', result);
-                getComment();
-                setComment('');
-            })
-            .catch(error => {
-                const result = error.response.data;
-                // console.log('에러', result)
-            })
-    }
-    const getComment = async () => {
-        const token = JSON.parse(await AsyncStorage.getItem('token'));
-        axios.get(`${process.env.API_URL}/api/auth/recruit/${boardId}/comment`, {
-            headers: {
-                Authorization: `Bearer ${token.token}`,
-            }
+    const {getComment, writeComment} = useComment();
+
+    useEffect(()=>{
+        getComment().then((data)=>setCommentList(data));
+    },[])
+    const handleCommentSubmit = () => {
+        writeComment(comment, 0)
+        .then(()=>{
+            getComment().then((data) => setCommentList(data)); // 댓글 작성 후 목록 다시 불러옴
+            setComment(''); // 댓글 작성 후 입력창 초기화
         })
-            .then(res => {
-                const result = res.data;
-                console.log('성공', result);
-                setCommentList(result.data);
-            })
-            .catch(error => {
-                const result = error.response.data;
-                console.log('실패', result);
-            })
+        .catch((error) => {
+            // console.error('댓글 작성 오류:', error)
+        });
     }
-    useEffect(() => {
-        getComment();
-    }, [])
+
     return (
         <View>
             <TextInput style={{ borderWidth: 1, height: 50 }}
                 value={comment} onChangeText={setComment} />
-            <Pressable onPress={writeComment}
+            <Pressable onPress={handleCommentSubmit}
                 style={{ backgroundColor: 'yellow', alignItems: 'center', justifyContent: 'center', height: 50 }}>
                 <Text>댓글 작성</Text>
             </Pressable>
-            {commentList ? commentList.reverse().map((comment, index) => (
+            {commentList ? commentList.map((comment, index) => (
                 <View key={index} style={styles.comment_item_container}>
                     <Text>{`프로필 아이콘 : ${comment.profileIcon}`}</Text>
                     <Text>{`닉네임 : ${comment.nickname}`}</Text>

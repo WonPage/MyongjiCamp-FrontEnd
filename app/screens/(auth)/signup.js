@@ -5,7 +5,9 @@ import { Text, StyleSheet, View, Image, TextInput, Alert, Pressable, Keyboard, T
 import * as Progress from 'react-native-progress';
 import DefaultLayout from "../../layout/keyboardlayout";
 import axios from "axios";
+import KeyboardLayout from "../../layout/keyboardlayout";
 
+const API_URL = process.env.API_URL;
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -110,7 +112,7 @@ export function Step1Screen({navigation}) {
 
     }
     return (
-        <DefaultLayout>
+        <KeyboardLayout>
             <>
                 <Progress.Bar
                 style={styles.progress} progress={0.33}
@@ -183,7 +185,7 @@ export function Step1Screen({navigation}) {
                     <View style={styles.bottom_blank}></View>
                 </View>
             </>
-        </DefaultLayout>
+        </KeyboardLayout>
     )
 }
 export function Step2Screen({ route, navigation }) {
@@ -227,7 +229,7 @@ export function Step2Screen({ route, navigation }) {
         setIsPasswordCheckWrong(false);
     }
     return (
-        <DefaultLayout>
+        <KeyboardLayout>
             <>
             <Progress.Bar 
             style={styles.progress} 
@@ -269,7 +271,7 @@ export function Step2Screen({ route, navigation }) {
                 <View style={styles.bottom_blank}></View>
             </View>
             </>
-        </DefaultLayout>
+        </KeyboardLayout>
     )
 }
 export function Step3Screen({route, navigation}) {
@@ -320,7 +322,7 @@ export function Step3Screen({route, navigation}) {
             profileIcon: "1",
         }
         console.log(userData);
-        axios.post(`${process.env.API_URL}/api/members`,
+        axios.post(`${API_URL}/api/members`,
         userData,
         { headers: { 'Content-Type': 'application/json'}})
         .then(res => {
@@ -341,7 +343,7 @@ export function Step3Screen({route, navigation}) {
         })
     }
     return (
-        <DefaultLayout>
+        <KeyboardLayout>
             <>
             <Progress.Bar
             style={styles.progress}
@@ -382,7 +384,7 @@ export function Step3Screen({route, navigation}) {
                 <View style={styles.bottom_blank}></View>
             </View>
             </>
-        </DefaultLayout>
+        </KeyboardLayout>
     )
 }
 

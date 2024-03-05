@@ -5,6 +5,9 @@ import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useAlert } from "../../hook/usealert";
+
+const API_URL = process.env.API_URL;
 
 export default function OnGoing({navigation, route}) {
     const [onGoingList, setOnGoingList] = useState();
@@ -18,16 +21,17 @@ export default function OnGoing({navigation, route}) {
         params.append('direction', 'DESC');
         params.append('boardType', 'recruit');
         params.append('status', 'ongoing');
-
-        axios.get(`${process.env.API_URL}/api/board?${params.toString()}`)
+        
+        axios.get(`${API_URL}/api/board?${params.toString()}`)
         .then(res => {
             const result = res.data;
             // console.log('Home Render :', result.data);
             setOnGoingList(result.data);
         })
         .catch(error => {
-            const result = error.response.data;
-            console.log('Home Render Failed :', result.data);
+            // console.log(error);
+            // const result = error.response.data;
+            // console.log('Home Render Failed :', error);
         })
     }
     useEffect(()=>{
@@ -87,26 +91,11 @@ export function Complete(){
 }
 
 export function Finish() {
+    const alert = useAlert({message:'안녕하세요'});
     return(
         <View style={styles.container}>
             <StatusBar style="auto"/>
-            <Pressable onPress={async()=>{
-                const token = JSON.parse(await AsyncStorage.getItem('token'));
-                if (token) {
-                    console.log('토큰 있어요', token);
-                } else {
-                    console.log('토큰 없어요...');
-                }
-            }}><Text>토큰확인</Text></Pressable>
-
-            <Pressable onPress={async()=>{
-                const token = JSON.parse(await AsyncStorage.getItem('token'));
-                if (token) {
-                    await AsyncStorage.clear();
-                } else {
-                    console.log('토큰이 이미 없어요');
-                }
-            }}><Text>토큰 없애버리기</Text></Pressable>
+            <Pressable onPress={alert}><Text>네비게이션 확인</Text></Pressable>
         </View>
     )
 }

@@ -7,12 +7,15 @@ import DefaultLayout from "../../layout/keyboardlayout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, { Axios, AxiosError } from 'axios';
 import AuthLayout from '../../layout/authlayout';
+import { useAlert } from '../../hook/usealert';
+import KeyboardLayout from '../../layout/keyboardlayout';
+const API_URL = process.env.API_URL;
+
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
 export default function Login({ navigation, route }) {
     const inputRef = useRef();
-
     const handleTextClick = () => {
         inputRef.current.focus();
     }
@@ -29,18 +32,28 @@ export default function Login({ navigation, route }) {
             username: `${emailPrefix}@mju.ac.kr`,
             password: password,
         }
-        
-        axios.post(`${process.env.API_URL}/api/login`,
-        userData, { headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }})
+        axios.post(`${API_URL}/api/login`,
+        userData, { headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        }})
         //성공 핸들링
         .then(async(res) => {
             const result = res.data;
             // 비동기저장소에 토큰, 세션 정보 저장
             const token = result.data.token;
+            const refresh = result.data.refreshToken;
+            // const tokenExp = new Date(new Date().getTime() + 30 * 1000); //만료 테스트 30초
+            const tokenExp = new Date(new Date().getTime() + 60 * 1000 * 60 * 12); //실제 만료 12시간 - authlayout이랑 연결됨
+            // const refreshExp = new Date(new Date().getTime() + 10 * 1000); //리프레시 테스트 10초
+            const refreshExp = new Date(new Date().getTime() + 60 * 1000 * 60 * 5); //5시간을 만료갱신 기준으로 삼을 예정
             const loginData = {
                 token: token,
+                refresh: refresh,
                 session: (stayLoggedIn ? true : undefined),
+                tokenExp: tokenExp.toISOString(),
+                refreshExp: refreshExp.toISOString()
             }
+            console.log(loginData);
             await AsyncStorage.setItem('token', JSON.stringify(loginData));
             // Alert.alert('로그인 성공', result.data.message);
             navigation.reset({
@@ -52,8 +65,9 @@ export default function Login({ navigation, route }) {
         //에러 핸들링
         .catch (error => {
             const result = error.response.data;
+            console.log(result);
             navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
-            // Alert.alert('로그인 실패', result.data);
+            Alert.alert('로그인 실패', result.data);
             setPassword('');
         })
         .then (setLoginDisable(false))
@@ -72,7 +86,7 @@ export default function Login({ navigation, route }) {
     //이메일 콘솔에 뭐라고 찍히는지 확인하기
     return (
         <AuthLayout navigation={navigation} route={route}>
-        <DefaultLayout>
+        <KeyboardLayout>
             <View style={styles.container}>
                 <View style={styles.container_width}>
                     <View style={styles.icon}>
@@ -152,7 +166,7 @@ export default function Login({ navigation, route }) {
 
                 </View>
             </View>
-        </DefaultLayout>
+        </KeyboardLayout>
         </AuthLayout>
     );
 }

@@ -3,7 +3,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
+const API_URL = process.env.API_URL;
 export default function Resume({ navigation }) {
     const [resumeList, setResumeList] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -11,15 +13,41 @@ export default function Resume({ navigation }) {
     const [isEditable, setIsEditable] = useState(false);
     const getResumeList = async() => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
-        const data = await axios.get(`${process.env.API_URL}/api/auth/resume`, {
+        axios.get(`${API_URL}/api/auth/resume`, {
             headers: {Authorization: `Bearer ${token.token}`}
         })
-        setResumeList(data.data.data);
+        .then(res => {
+            setResumeList(res.data.data);
+        })
+        .catch(err => {
+            // console.log(err)
+        });
     }
     useEffect(()=>{
         getResumeList();
     }, [])
 
+    const handleResumeAdd = async() => {
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.post(`${API_URL}/api/auth/resume`, {title: '테스트', content: '테스트다 하하하', url: 'dsafskdnfnaa.com'}, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token.token}`
+                }})
+            .then(res => {
+                Alert.alert('안내', res.data.data);
+                getResumeList();
+            })
+            .catch(error=> {
+                // console.log(error);
+                Alert.alert('경고', '글 작성에 실패하였습니다.');
+                getResumeList();
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
     return (
         <View style={{ flex: 1 }}>
             <View style={styles.notice_container}>
@@ -28,41 +56,17 @@ export default function Resume({ navigation }) {
             </View>
             <View style={styles.resume_container}>
                 <FlatList
-                    style={{ backgroundColor: 'red', flex: 1, }}
+                    style={{marginHorizontal: hp('3%')}}
                     contentContainerStyle={styles.resume_item_container}
                     data={resumeList}
+                    
+                    ListFooterComponent={resumeList === null || resumeList?.length>=3 ? ( <></> ):
+                    (
+                        <TouchableOpacity style={[styles.resume_add_button, {marginTop: hp('5%')}]} onPress={handleResumeAdd}><Text>+ 이력서 추가하기</Text></TouchableOpacity>
+                    )}
+                    ItemSeparatorComponent={<View style={{height:hp('6%')}}></View>}
                     renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createDate} id={item.id} getResumeList={getResumeList} setModalVisible={setModalVisible} setModalResumeData={setModalResumeData}/>} />
-                { resumeList === null || resumeList.length<3 ? (
-                <TouchableOpacity onPress={async()=>{
-                    try{
-                        const token = JSON.parse(await AsyncStorage.getItem('token'));
-                        // const res = await axios.post(`http://192.168.89.73:8080/api/auth/resume`, {
-                        const res = await axios.post(`${process.env.API_URL}/api/auth/resume`, {
-                            title: '테스트', content: '테스트다 하하하', url: 'dsafskdnfnaa.com'
-                        }, {
-                            headers: {
-                                'Content-Type' : 'application/json',
-                                Authorization: `Bearer ${token.token}`
-                            }
-                        })
-                        if (res.data.status === 200) {
-                            Alert.alert('안내', res.data.data);
-                            getResumeList();
-                        }
-                        else {
-                            Alert.alert('경고', '글 작성에 실패하였습니다.');
-                            getResumeList();
-                        }
-                    } catch (error) {
-                        console.log(error);
-                    }
-
-                }}><Text>+ 이력서 추가하기</Text></TouchableOpacity>
-                ) : ( undefined )
-                }
-
                 {modalResumeData ? (
-                
                 <Modal
                 animationType="slide"
                 visible={modalVisible}
@@ -112,19 +116,31 @@ export default function Resume({ navigation }) {
 }
 
 const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, setModalResumeData }) => {
+    const date = new Date(createDate);
+    const currentDate = new Date();
+    const currentYear = date.getFullYear();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const vintageDate = `${year}.${month}.${day}`
+    const formattedDate = `${month}월 ${day}일 ${hours}:${minutes}`
+
     const resumeDelete = async(id) => {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            await axios.delete(`${process.env.API_URL}/api/auth/resume/${id}`, {
+            axios.delete(`${API_URL}/api/auth/resume/${id}`, {
                 headers: {Authorization: `Bearer ${token.token}`}
-            }).then(res => {
-                if (res.data.status === 200) {
-                    Alert.alert('안내', res.data.data);
-                    getResumeList();
-                } else {
-                    Alert.alert('경고', res.data.data);
-                    getResumeList();
-                }
+            })
+            .then(res => {
+                const result = res.data.data;
+                Alert.alert('안내', result);
+                getResumeList();
+            })
+            .catch(err=>{
+                Alert.alert('경고', err);
+                getResumeList();
             })
         } catch (error) {
             console.log(error);
@@ -133,13 +149,13 @@ const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, set
     const resumeDetail = async(id) => {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const res = await axios.get(`${process.env.API_URL}/api/auth/resume/${id}`, {
+            axios.get(`${API_URL}/api/auth/resume/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token.token}`,
                 }
-            });
-            const result = res.data.data;
-            if (res.status === 200) {
+            })
+            .then(res => {
+                const result = res.data.data;
                 setModalResumeData({
                     title : result.title,
                     content : result.content,
@@ -148,29 +164,36 @@ const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, set
                     id: result.id,
                 })
                 setModalVisible(true);
-            } else {
+            })
+            .catch(err=>{
                 Alert.alert('경고', '문제가 발생했습니다.');
-            }
+            })
         } catch (error){
             console.log(error);
         }
     }
     return (
-        <TouchableOpacity style={styles.resume_item} onPress={()=>{resumeDetail(id)}}>
-            <View style={{flexDirection:'row'}}>
-                <Text style={{fontSize:23, justifyContent:'space-between'}}>{title},{id}</Text>
-                <Text>{createDate}</Text>
+        <View style={[styles.resume_item, {height:hp('18%'), padding:hp('2%')}]}>
+        <TouchableOpacity style={{flex:1, justifyContent:'space-between'}} onPress={()=>{resumeDetail(id)}}>
+            <View style={{flexDirection:'row', justifyContent:'space-between', marginHorizontal: hp('1%')}}>
+                <Text style={{fontSize:23, justifyContent:'space-between'}}>{title}</Text>
+                <View style={{alignItems: 'center'}}>
+                    <Text style={{fontSize: 13}}>최종 수정일</Text>
+                    <Text style={{fontSize: 11}}>{currentYear>year ? vintageDate : formattedDate}</Text>
+                </View>
             </View>
             <View style={{flexDirection:'row', justifyContent:'space-around'}}>
-                <TouchableOpacity style={styles.resume_button}>
+                <TouchableOpacity style={[styles.resume_button, {height:hp('5%')}]}>
                     <Text>수정</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.resume_button}
+                <TouchableOpacity style={[styles.resume_button, {height:hp('5%')}]}
                 onPress={() => {resumeDelete(id)}}>
                     <Text>삭제</Text>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
+        </View>
+
     )
 }
 
@@ -180,19 +203,23 @@ const styles = StyleSheet.create({
     },
     resume_container: {
         flex: 7,
-        backgroundColor: 'yellow'
     },
     resume_item_container: {
-        backgroundColor: 'green',
+    },
+    resume_add_button: {
+        backgroundColor:'white', height:hp('7%'), alignItems:'center', justifyContent:'center', marginHorizontal: '25%', borderRadius:30, borderWidth: 1,
     },
     resume_item: {
-        margin: 10,
-        backgroundColor:'white',
         borderRadius: 10,
+        backgroundColor:'#A6BFFF'
     },
     resume_button: {
         borderWidth: 1,
-        borderRadius: 10,
+        borderRadius: 14,
+        flex:1,
+        justifyContent: 'center', alignItems: 'center',
+        marginHorizontal:'3%',
+        backgroundColor:'white'
     },
     modal_container_android:{
         backgroundColor:'white',

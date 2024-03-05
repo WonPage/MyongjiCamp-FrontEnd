@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+const API_URL = process.env.API_URL;
 export default function SearchResult({navigation, route}){
     const [resultList, setResultList] = useState();
 
@@ -41,32 +42,40 @@ export default function SearchResult({navigation, route}){
         params.append('status', query.status);
 
         console.log(params.toString());
-        axios.get(`${process.env.API_URL}/api/board?${params.toString()}`)
+        axios.get(`${API_URL}/api/board?${params.toString()}`)
+        // axios.get(`http://192.168.89.73:8080/api/board?${params.toString()}`)
         .then(res => {
             const result = res.data;
             console.log('옴', result.data);
             setResultList(result.data);
         })
         .catch(error => {
-            const result = error.response.data;
-            console.log('실패', result.data);
+            const result = error;
+            // const result = error.response.data;
+            console.log('실패', result);
         })
     }
     useEffect(()=>{
         searching();
     },[])
+    const moveDetail = (boardId) => {
+        // console.log(boardId);
+        navigation.navigate('PostDetail', {title: '모집 중', boardId: boardId});
+    }
     return (
         <View>
             <Text>{ keyword === '' ? ('검색어가 존재하지 않습니다.') : (`'${keyword}'에 대한 결과입니다.`)}</Text>
             <Text>{roles.map((tag)=>(`#${tag} `))}</Text>
             <View>
-                {resultList ? resultList.reverse().map((result, index)=>(
-                            <View key={index} style={styles.result_item_container}>
-                                <Text>{result.modifiedDate}</Text>
-                                <Text>{result.roles}</Text>
-                                <Text>{result.title}</Text>
-                                <Text>{`스크랩 : ${result.scrapCount}`}</Text>
-                            </View>
+                {resultList ? resultList.map((item, index)=>(
+                    <TouchableOpacity key={index} onPress={()=>{moveDetail(item.boardId)}}>
+                        <View style={{ borderWidth: 1 }}>
+                            <Text>{item.modifiedDate}</Text>
+                            <Text>{item.roles}</Text>
+                            <Text>{item.title}</Text>
+                            <Text>{`스크랩 : ${item.scrapCount}`}</Text>
+                        </View>
+                    </TouchableOpacity>
                         )) : (<></>)}
             </View>
         </View>

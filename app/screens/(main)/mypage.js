@@ -6,7 +6,9 @@ import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import AuthLayout from "../../layout/authlayout";
+import axios from "axios";
 
+const API_URL = process.env.API_URL;
 export default function MyPage({navigation, route}) {
     useEffect(()=>{
 
@@ -58,11 +60,23 @@ const Item = ({title, page, navigation}) => {
     if (page === 'Logout') {
         return (
             <TouchableOpacity style={styles.page_item} onPress={async()=>{
-                await AsyncStorage.clear().then(console.log('로그아웃 완료.'));
-                navigation.reset({
-                    index: 0,
-                    routes: [{name: 'Login'}],
-                });
+                const token = JSON.parse(await AsyncStorage.getItem('token'));
+                // console.log(token);
+                axios.post(`${API_URL}/api/auth/logout`, {}, {
+                    headers:{'Content-Type':'application/json', Authorization: `Bearer ${token.token}`}
+                })
+                .then(res => {
+                    AsyncStorage.clear();
+                    const data = res.data;
+                    console.log('Logout :', data);
+                    navigation.reset({
+                        index: 0,
+                        routes: [{name: 'Login'}],
+                    });
+                })
+                .catch(err => {
+                    console.log(err);
+                })
             }}>
                 <Text style={styles.page_title}>{title}</Text>
             </TouchableOpacity>

@@ -9,6 +9,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView } from "react-native";
 import AuthLayout from "../../layout/authlayout";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { usePOST } from "../../hook/useaxios";
+import { FontAwesome6 } from "@expo/vector-icons";
+
+const API_URL = process.env.API_URL;
 
 export function PostButton({navigation, route}){
     return (
@@ -24,7 +28,7 @@ export function PostSend(){
     )
 }
 
-function RoleItem({roleData, setRoleData}){
+function RoleItem({roleData, setRoleData, setViewHeight}){
     const inputRefs = useRef([]);
     const inputRefs2 = useRef([]);
     const handleNumberChange = (type, index, value) => {
@@ -50,53 +54,107 @@ function RoleItem({roleData, setRoleData}){
           inputRefs2.current[index].focus();
         }
       };
+      const handleRoleDelete = (index) => {
+        const updatedRoleData = [...roleData];
+        updatedRoleData.splice(index, 1);
+        setRoleData(updatedRoleData);
+        setViewHeight(prev=>prev-8);
+      };
     return (
         <>
         {roleData.map((value, index) => {
-        return (
-            <View style={[styles.role_item, {height:hp('8%')}]} key={index}>
-                 <Picker
-                    style={styles.role_picker}
-                    selectedValue={value.role}
-                    onValueChange={(itemValue, itemIndex) => { setRoleData((prev) => {
-                        return prev.map((v, i) => {
-                            if (i === index) {
-                                return { ...v, role: itemValue }
-                            }
-                            return v;
-                        });
-                    })}}>
-                    <Picker.Item style={styles.picker_item} label="프론트엔드" value={'FRONT'} />
-                    <Picker.Item style={styles.picker_item} label="백엔드" value={'BACK'} />
-                    <Picker.Item style={styles.picker_item} label="AI" value={'AI'} />
-                    <Picker.Item style={styles.picker_item} label="디자인" value={'DESIGN'} />
-                    <Picker.Item style={styles.picker_item} label="풀스택" value={'FULL'} />
-                    <Picker.Item style={styles.picker_item} label="기획" value={'PM'} />
-                    <Picker.Item style={styles.picker_item} label="ETC" value={'ETC'} />
-                </Picker> 
-                <View style={styles.role_number_container}>
-                    <TextInput 
-                    // autoFocus={index>0 ? true : undefined}
-                    ref={(ref) => (inputRefs2.current[index] = ref)}
-                    style={styles.role_input} placeholder="0" value={value.appliedNumber.toString()}
-                    maxLength={1} keyboardType='number-pad' returnKeyType="next"
-                    onChangeText={(text) => handleNumberChange('appliedNumber', index, text)}
-                    onSubmitEditing={() => handleNext(index)}/>
-                    <TextInput 
-                    ref={(ref) => (inputRefs.current[index] = ref)}
-                    style={styles.role_input} placeholder="0" value={value.requiredNumber.toString()}
-                    maxLength={1} keyboardType='number-pad'
-                    onChangeText={(text) => handleNumberChange('requiredNumber', index, text)}
-                    onSubmitEditing={() => handleNext2(index+1)}/>
-                </View>
-            </View>
-        )})}        
+            if (index<2) {
+                return (
+                    <View style={[styles.role_item, {height:hp('8%')}]} key={index}>
+                         <Picker
+                            style={styles.role_picker}
+                            selectedValue={value.role}
+                            onValueChange={(itemValue, itemIndex) => { setRoleData((prev) => {
+                                return prev.map((v, i) => {
+                                    if (i === index) {
+                                        return { ...v, role: itemValue }
+                                    }
+                                    return v;
+                                });
+                            })}}>
+                            <Picker.Item style={styles.picker_item} label="프론트엔드" value={'FRONT'} />
+                            <Picker.Item style={styles.picker_item} label="백엔드" value={'BACK'} />
+                            <Picker.Item style={styles.picker_item} label="AI" value={'AI'} />
+                            <Picker.Item style={styles.picker_item} label="디자인" value={'DESIGN'} />
+                            <Picker.Item style={styles.picker_item} label="풀스택" value={'FULL'} />
+                            <Picker.Item style={styles.picker_item} label="기획" value={'PM'} />
+                            <Picker.Item style={styles.picker_item} label="ETC" value={'ETC'} />
+                        </Picker> 
+                        <View style={styles.role_number_container}>
+                            <TextInput 
+                            // autoFocus={index>0 ? true : undefined}
+                            ref={(ref) => (inputRefs2.current[index] = ref)}
+                            style={styles.role_input} placeholder="0" value={value.appliedNumber.toString()}
+                            maxLength={1} keyboardType='number-pad' returnKeyType="next"
+                            onChangeText={(text) => handleNumberChange('appliedNumber', index, text)}
+                            onSubmitEditing={() => handleNext(index)}/>
+                            <TextInput 
+                            ref={(ref) => (inputRefs.current[index] = ref)}
+                            style={styles.role_input} placeholder="0" value={value.requiredNumber.toString()}
+                            maxLength={1} keyboardType='number-pad'
+                            onChangeText={(text) => handleNumberChange('requiredNumber', index, text)}
+                            onSubmitEditing={() => handleNext2(index+1)}/>
+                        </View>
+                        <TouchableOpacity style={styles.role_delete} activeOpacity={0.7} onPress={()=>handleRoleDelete(index)}>
+                            <FontAwesome6 name="trash-can" size={20} color="lightgray" />
+                        </TouchableOpacity>
+                    </View>
+                )
+            } else {
+                return (
+                <View style={[styles.role_item, {height:hp('8%')}]} key={index}>
+                    <Picker
+                       style={styles.role_picker}
+                       selectedValue={value.role}
+                       onValueChange={(itemValue, itemIndex) => { setRoleData((prev) => {
+                           return prev.map((v, i) => {
+                               if (i === index) {
+                                   return { ...v, role: itemValue }
+                               }
+                               return v;
+                           });
+                       })}}>
+                       <Picker.Item style={styles.picker_item} label="프론트엔드" value={'FRONT'} />
+                       <Picker.Item style={styles.picker_item} label="백엔드" value={'BACK'} />
+                       <Picker.Item style={styles.picker_item} label="AI" value={'AI'} />
+                       <Picker.Item style={styles.picker_item} label="디자인" value={'DESIGN'} />
+                       <Picker.Item style={styles.picker_item} label="풀스택" value={'FULL'} />
+                       <Picker.Item style={styles.picker_item} label="기획" value={'PM'} />
+                       <Picker.Item style={styles.picker_item} label="ETC" value={'ETC'} />
+                    </Picker> 
+                    <View style={styles.role_number_container}>
+                       <TextInput 
+                       // autoFocus={index>0 ? true : undefined}
+                       ref={(ref) => (inputRefs2.current[index] = ref)}
+                       style={styles.role_input} placeholder="0" value={value.appliedNumber.toString()}
+                       maxLength={1} keyboardType='number-pad' returnKeyType="next"
+                       onChangeText={(text) => handleNumberChange('appliedNumber', index, text)}
+                       onSubmitEditing={() => handleNext(index)}/>
+                       <TextInput 
+                       ref={(ref) => (inputRefs.current[index] = ref)}
+                       style={styles.role_input} placeholder="0" value={value.requiredNumber.toString()}
+                       maxLength={1} keyboardType='number-pad'
+                       onChangeText={(text) => handleNumberChange('requiredNumber', index, text)}
+                       onSubmitEditing={() => handleNext2(index+1)}/>
+                    </View>
+                    <TouchableOpacity style={styles.role_delete} activeOpacity={0.6} onPress={()=>handleRoleDelete(index)}>
+                        <FontAwesome6 name="trash-can" size={20} color="black" />
+                    </TouchableOpacity>
+               </View>
+                )
+            }
+        })}        
         </>
     )
 }
 
 export default function Post({navigation, route}) {
-    const [viewHeight, setViewHeight] = useState(130);
+    const [viewHeight, setViewHeight] = useState(138);
 
     const [postTitle, setPostTitle] = useState('');
     const [postContent, setPostContent] = useState('');
@@ -104,8 +162,9 @@ export default function Post({navigation, route}) {
     const [postDuration, setPostDuration] = useState('');
     const [durationUnit, setDurationUnit] = useState('일'); 
 
+
     //백엔드에서 get으로 받아와서 set해줘야됨
-    const [roleData, setRoleData] = useState([{role:'FRONT', appliedNumber:'', requiredNumber:''}]);
+    const [roleData, setRoleData] = useState([{role:'FRONT', appliedNumber:'', requiredNumber:''}, {role:'BACK', appliedNumber:'', requiredNumber:''}]);
 
     const handleRoleAdd = () => {
         setViewHeight(prev=>prev+8)
@@ -116,6 +175,20 @@ export default function Post({navigation, route}) {
         if (postTitle.length < 1 || postContent.length < 1 || postLocation.length < 1 || postDuration.length < 1) {
             return Alert.alert('경고', '빈칸을 채워주세요.');
         }
+    
+        const roleCheck = new Set(roleData);
+        if (roleCheck.size !== roleData.length) {
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:'직무는 중복선택 할 수 없습니다.'})
+        }
+
+        let flag = false;
+        roleData.map((value) => {
+            if (value.appliedNumber > value.requiredNumber) {
+                flag = true;
+                return navigation.navigate('ModalLayout', { component: 'MyAlert', title: '안내', message: '현재인원은 필요인원보다 클 수 없습니다.' });
+            }
+        })
+
         const postData = {
           title: postTitle,
           content: postContent,
@@ -126,10 +199,10 @@ export default function Post({navigation, route}) {
         
         // 안내문구 ( 정말 작성? )
         // navigation.navigate('ModalLayout', {component: 'SelectAlert', title:'안내', message:'정말 작성하시겠습니까?'});
-
+        if (!flag) {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const res = await axios.post(`${process.env.API_URL}/api/auth/recruit`, postData, {
+            const res = await axios.post(`${API_URL}/api/auth/recruit`, postData, {
                 headers : {
                     'Content-Type':'application/json',
                     Authorization: `Bearer ${token.token}`,
@@ -138,7 +211,7 @@ export default function Post({navigation, route}) {
             const result = res.data.data;
             console.log(res.data);
             if (res.data.status === 200) {
-                navigation.push('Root'); //나중에 바꿔줘야함
+                navigation.pop(); //나중에 바꿔줘야함
                 navigation.navigate('ModalLayout', {component: 'MyAlert', title:'안내', message: result});
                 // Alert.alert('안내', result);
             } else {
@@ -147,6 +220,7 @@ export default function Post({navigation, route}) {
             }
         }catch(error){
             console.log(error);
+        }
         }
       };
     return (
@@ -178,7 +252,7 @@ export default function Post({navigation, route}) {
                                 <Text style={{fontSize: 12}}>현재인원 / 필요인원</Text>
                             </View>
                             <View style={styles.role_item_container}>
-                                <RoleItem roleData={roleData} setRoleData={setRoleData} />
+                                <RoleItem roleData={roleData} setRoleData={setRoleData} setViewHeight={setViewHeight} />
                             </View>
                             <TouchableOpacity 
                             style={[styles.role_add_button, {height: hp('6%'), marginTop: hp('2%'), display:(roleData.length>=7 ? 'none' : undefined)}]} onPress={handleRoleAdd}>
@@ -253,19 +327,19 @@ const styles = StyleSheet.create({
         },
         role_item: {
             alignItems: 'center', justifyContent: 'space-between',
-            flexDirection: 'row', marginHorizontal: '5%',
+            flexDirection: 'row', marginHorizontal: '2%',
         },
         role_picker: {
-            flex: 3,
-            marginRight: '10%'
+            flex: 5,
+            marginRight: '3%'
         },
         picker_item: {
             fontSize: 18
         },
         role_number_container: {
-            marginRight: '3%',
+            marginRight: '6%',
             justifyContent:'center',
-            flex: 1,
+            flex: 2,
             flexDirection: 'row',
             backgroundColor: 'yellow',
             borderWidth: 1,
@@ -275,6 +349,9 @@ const styles = StyleSheet.create({
             marginHorizontal: '5%',
             textAlign: 'center',
             fontSize: 15,
+        },
+        role_delete:{
+            flex: 1,
         },
         role_add_button:{
             backgroundColor: 'yellow',
