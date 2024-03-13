@@ -1,38 +1,151 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import DefaultLayout from "../../layout/keyboardlayout";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
+import { FlatList } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AuthLayout from "../../layout/authlayout";
 import axios from "axios";
-
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import KeyboardLayout from "../../layout/keyboardlayout";
+import { Octicons, SimpleLineIcons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 const API_URL = process.env.API_URL;
 export default function MyPage({navigation, route}) {
+    const iconPath = {
+        1 : require('../../../assets/icon/profile-icon-1.png'),
+        2 : require('../../../assets/icon/profile-icon-2.png'),
+        3 : require('../../../assets/icon/profile-icon-3.png'),
+        4 : require('../../../assets/icon/profile-icon-4.png'),
+        5 : require('../../../assets/icon/profile-icon-5.png'),
+    }
+    const [userData, setUserData] = useState();
+    const [nicknameModalVisible, setNicknameModalVisible] = useState(false);
+    const [newNickname, setNewNickname] = useState('');
+    const getProfile = async() => {
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.get(`${API_URL}/api/auth/profile`, {
+                headers: {Authorization: `Bearer ${token.token}`}
+            })
+            .then(res =>{
+                const result = res.data.data;
+                console.log(result);
+                setUserData(result);
+                setNewNickname(res.data.data.nickname);
+            })
+            .catch(err=>{
+                // console.log('여기다 바보야', err)
+            })
+        }catch(err) {
+            console.log(err)
+        }
+    }
+    const nicknameChange = async() => {
+        console.log(newNickname);
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.put(`${API_URL}/api/auth/nickname/update`, {
+                nickname:newNickname,
+            },{
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token.token}`
+                }
+            })
+            .then(res =>{
+                const result = res.data.data;
+                getProfile();
+                setNicknameModalVisible(false);
+                // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }catch(err) {console.log(err)}
+    }
     useEffect(()=>{
-
+        getProfile();
     },[])
     const page_list = [
         {page:'Notice', title:'공지사항'},
         {page:'FAQ', title:'FAQ'},
         {page:'Event', title:'이벤트'},
-        {page:'Account', title: '계정관리'},
         {page:'Information', title:'이용안내'},
         {page:'NotifySetting', title:'알림설정'},
+        {page:'PwChange', title: '비밀번호 변경'},
         {page:'Logout', title:'로그아웃'}
     ]
+    const profileIcons = [
+        {id: 1, name: 'red', image: require('../../../assets/icon/profile-icon-1.png')},
+        {id: 2, name: 'green', image: require('../../../assets/icon/profile-icon-2.png')},
+        {id: 3, name: 'blue', image: require('../../../assets/icon/profile-icon-3.png')},
+        {id: 4, name: 'purple', image: require('../../../assets/icon/profile-icon-4.png')},
+        {id: 5, name: 'pink', image: require('../../../assets/icon/profile-icon-5.png')},
+    ]
+    const profileChange = async(iconId) => {
+        if (userData?.profileIcon === iconId) {
+            return;
+        }
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.put(`${API_URL}/api/auth/icon/update`, {
+                profileIcon:iconId,
+            },{
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token.token}`
+                }
+            })
+            .then(async(res) =>{
+                const result = res.data.data;
+                const newToken = result.token;
+                console.log(token);
+                // const newTokenData = {
+                //     userId: token.userId,
+                //     token: newToken,
+                //     refresh: token.refresh,
+                //     session: token.session,
+                //     tokenExp: tokenExp.toISOString(),
+                //     refreshExp: refreshExp.toISOString()
+                // }
+                getProfile();
+                // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
+            })
+            .catch(err => {
+                console.log(err.response.data);
+            })
+        } catch(err){
+            console.log(err);
+        }
+    }
     return(
         <AuthLayout navigation={navigation} route={route}>
         <View style={[styles.container]}>
             <StatusBar style="auto"/>
             <View style={styles.profile_container}>
-                <View style={{flex: 1}}>
-                    <View style={{backgroundColor:'gray', width:'80%', height:'50%', borderRadius: 50}}><Text>이미지</Text></View>
+                <View>
+                    <View style={{justifyContent:'center', alignItems:'center', width:hp('15%'), height:hp('15%'), marginLeft:hp('0.5%'), marginRight:hp('2%')}}>
+                        {/* <Image source={profileIcon.image} style={{borderRadius:100, width:hp('20%'), height:hp('20%')}}/> */}
+                        <Picker
+                        style={{width:'100%', height:'90%', opacity:0, position:'absolute'}}
+                        onValueChange={(iconId) => profileChange(iconId)}>
+                        {profileIcons.map((icon) => (
+                            <Picker.Item key={icon.id} label={icon.name} value={icon.id} />
+                        ))}
+                        </Picker>
+                        <Image style={{borderRadius: 50}} source={iconPath[userData?.profileIcon]}/>
+                    </View>
                 </View>
-                <View style={{flex: 2}}>
-                    <Text style={{fontSize: 30}}>닉네임</Text>
-                    <Text style={{fontSize: 17}}>이메일 주소</Text>
+                <View>
+                    <TouchableOpacity onPress={()=>{
+                        setNicknameModalVisible(true);
+                    }} style={{marginBottom:hp('0.5%'), flexDirection:'row', alignItems:"center"}}>
+                        <Text style={{fontSize: 30}}>{userData?.nickname}</Text>
+                        <Octicons style={{marginLeft:5}} name="pencil" size={18} color="black" />
+                    </TouchableOpacity>
+                    <Text style={{fontSize: 15}}>{userData?.email}</Text>
                 </View>
             </View>
             <View style={styles.resume_container}>
@@ -52,6 +165,27 @@ export default function MyPage({navigation, route}) {
                 renderItem={({item}) => <Item title={item.title} page={item.page} navigation={navigation}/>}
                 />
             </View>
+            {/* 닉네임 변경 Modal */}
+            <Modal
+            animationType="fade" visible={nicknameModalVisible}
+            onRequestClose={()=>setNicknameModalVisible(false)} transparent={true}>
+                <Pressable style={{height:'100%', backgroundColor:'rgba(0, 0, 0, 0.4)'}} onPress={()=>setNicknameModalVisible(false)}/>
+                <View style={{borderRadius:30, position:'absolute', height:hp('43%'), width:'75%', marginLeft:'12%', marginTop:'45%', backgroundColor:'white',}}>
+                    <KeyboardLayout>
+                    <View style={{flex:1, padding:'10%'}}>
+                        <Text style={{fontSize:28, textAlign:'center', marginTop:'10%'}}>닉네임 변경</Text>
+                        <TextInput value={newNickname} onChangeText={(text)=>setNewNickname(text)}
+                        style={{borderWidth:1, height:hp('8%'), marginTop:'10%', borderRadius:20, paddingHorizontal:16}}/>
+                        <View style={{alignItems:'center', marginTop:'20%'}}>
+                            <TouchableOpacity style={{borderRadius:40,backgroundColor:'skyblue', height:hp('10%'),alignItems:'center', justifyContent:'center',
+                            paddingHorizontal: hp('2%')}} onPress={()=>nicknameChange()}>
+                                <Text>중복 확인 및 변경</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    </KeyboardLayout>
+                </View>
+            </Modal>
         </View>
         </AuthLayout>
     )
@@ -75,7 +209,7 @@ const Item = ({title, page, navigation}) => {
                     });
                 })
                 .catch(err => {
-                    console.log(err);
+                    // console.log(err);
                 })
             }}>
                 <Text style={styles.page_title}>{title}</Text>
@@ -98,8 +232,8 @@ const styles = StyleSheet.create({
     profile_container:{
         flex: 2.5,
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
+        marginHorizontal:'8%'
     },
     resume_container:{
         flex: 0.8,

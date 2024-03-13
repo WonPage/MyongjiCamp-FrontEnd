@@ -3,7 +3,7 @@ import KeyboardLayout from "../../layout/keyboardlayout";
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 export default function Search({navigation, route}) {
     const tags = [
         {name:'프론트엔드', value:'FRONT'},
@@ -41,7 +41,7 @@ export default function Search({navigation, route}) {
     return (
         <KeyboardLayout>
             <View style={{ marginHorizontal: '5%', flex: 1, }}>
-                <View style={styles.search_container}>
+                <View style={[styles.search_container, {marginBottom:hp('3%')}]}>
                     <TextInput style={styles.search_input} placeholder="검색창"
                         value={searchWord} onChangeText={setSearchWord}
                         onSubmitEditing={moveSearchResult} autoFocus={true} />
@@ -60,6 +60,7 @@ export default function Search({navigation, route}) {
                             iconStyle={{
                                 // display: 'none',
                             }}
+                            textContainerStyle={{marginLeft:10}}
                             isChecked={selectedTags.includes(tag.name)}
                             onPress={() => handleTagSelect(tag.name)}
                         />)
@@ -100,7 +101,9 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#ccc",
         padding: 7,
+        paddingRight: 13,
         marginBottom: 10,
         backgroundColor: "#ffffff",
+        marginRight: 10,
     },
 });

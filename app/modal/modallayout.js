@@ -17,14 +17,14 @@ export default function ModalLayout({navigation, route}) {
                 break;
             };
             case 'SelectAlert' : {
-                setMode(<SelectAlert navigation={navigation} title={title} message={message}/>);
+                setMode(<SelectAlert afterAction={route.params.afterAction} navigation={navigation} title={title} message={message} action={route.params.action} data={route.params.data}/>);
                 setModeStyle(styles.select_container);
                 break;
             }
         }
     },[])
     return (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent:'center', }}>
+        <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
             <Pressable style={[StyleSheet.absoluteFill, styles.alert_background]}
                 onPress={navigation.goBack} />
             <View style={modeStyle ? modeStyle : styles.modal_container}>

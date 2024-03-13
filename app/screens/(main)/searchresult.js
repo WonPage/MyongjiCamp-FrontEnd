@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const API_URL = process.env.API_URL;
 export default function SearchResult({navigation, route}){
@@ -46,13 +46,13 @@ export default function SearchResult({navigation, route}){
         // axios.get(`http://192.168.89.73:8080/api/board?${params.toString()}`)
         .then(res => {
             const result = res.data;
-            console.log('옴', result.data);
+            // console.log('옴', result.data);
             setResultList(result.data);
         })
         .catch(error => {
             const result = error;
             // const result = error.response.data;
-            console.log('실패', result);
+            // console.log('실패', result);
         })
     }
     useEffect(()=>{
@@ -66,7 +66,7 @@ export default function SearchResult({navigation, route}){
         <View>
             <Text>{ keyword === '' ? ('검색어가 존재하지 않습니다.') : (`'${keyword}'에 대한 결과입니다.`)}</Text>
             <Text>{roles.map((tag)=>(`#${tag} `))}</Text>
-            <View>
+            <ScrollView>
                 {resultList ? resultList.map((item, index)=>(
                     <TouchableOpacity key={index} onPress={()=>{moveDetail(item.boardId)}}>
                         <View style={{ borderWidth: 1 }}>
@@ -77,7 +77,7 @@ export default function SearchResult({navigation, route}){
                         </View>
                     </TouchableOpacity>
                         )) : (<></>)}
-            </View>
+            </ScrollView>
         </View>
     )   
 }

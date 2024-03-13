@@ -10,7 +10,7 @@ export default function Resume({ navigation }) {
     const [resumeList, setResumeList] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalResumeData, setModalResumeData] = useState(null);
-    const [isEditable, setIsEditable] = useState(false);
+    const [modalMode, setModalMode] = useState('VIEW');
     const getResumeList = async() => {
         const token = JSON.parse(await AsyncStorage.getItem('token'));
         axios.get(`${API_URL}/api/auth/resume`, {
@@ -25,23 +25,88 @@ export default function Resume({ navigation }) {
     }
     useEffect(()=>{
         getResumeList();
-    }, [])
+        // console.log(modalResumeData);
+    }, []);
 
-    const handleResumeAdd = async() => {
+    const handleResumeAdd = () => {
+        setModalResumeData({
+            title : "",
+            content : "",
+            url: "",
+        })
+        setModalMode('CREATE');
+        setModalVisible(true);
+    }
+
+    const handleResumePost = async() => {
+        if (modalResumeData.title === "") {
+            return Alert.alert('안내', '제목을 입력해주세요.');
+        }
+        if (modalResumeData.content === ""){
+            return Alert.alert('안내', '내용을 입력해주세요');
+        }
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.post(`${API_URL}/api/auth/resume`, {title: '테스트', content: '테스트다 하하하', url: 'dsafskdnfnaa.com'}, {
+            axios.post(`${API_URL}/api/auth/resume`, modalResumeData, {
                 headers: {
                     'Content-Type' : 'application/json',
                     Authorization: `Bearer ${token.token}`
                 }})
             .then(res => {
                 Alert.alert('안내', res.data.data);
+                setModalVisible(false);
                 getResumeList();
             })
             .catch(error=> {
                 // console.log(error);
                 Alert.alert('경고', '글 작성에 실패하였습니다.');
+                getResumeList();
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleResumeChange = (type, value) => {
+        setModalResumeData(prevState => ({...prevState, [type]:value}));
+    };
+    const handleResumeUpdate = async(resumeId) => {
+        if (modalResumeData.title === "") {modalResumeData.title = `이력서 ${modalResumeData.id}`}
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.put(`${API_URL}/api/auth/resume/${resumeId}`, modalResumeData, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token.token}`
+                }})
+            .then(res => {
+                Alert.alert('안내', res.data.data);
+                setModalVisible(false);
+                getResumeList();
+            })
+            .catch(error=> {
+                // console.log(error);
+                Alert.alert('경고', '글 작성에 실패하였습니다.');
+                getResumeList();
+            })
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    const resumeDelete = async(id) => {
+        try{
+            const token = JSON.parse(await AsyncStorage.getItem('token'));
+            axios.delete(`${API_URL}/api/auth/resume/${id}`, {
+                headers: {Authorization: `Bearer ${token.token}`}
+            })
+            .then(res => {
+                const result = res.data.data;
+                Alert.alert('안내', result);
+                setModalVisible(false);
+                getResumeList();
+            })
+            .catch(err=>{
+                Alert.alert('경고', err);
                 getResumeList();
             })
         } catch (error) {
@@ -65,7 +130,7 @@ export default function Resume({ navigation }) {
                         <TouchableOpacity style={[styles.resume_add_button, {marginTop: hp('5%')}]} onPress={handleResumeAdd}><Text>+ 이력서 추가하기</Text></TouchableOpacity>
                     )}
                     ItemSeparatorComponent={<View style={{height:hp('6%')}}></View>}
-                    renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createDate} id={item.id} getResumeList={getResumeList} setModalVisible={setModalVisible} setModalResumeData={setModalResumeData}/>} />
+                    renderItem={({ item }) => <ResumeItem title={item.title} createDate={item.createDate} id={item.id} getResumeList={getResumeList} setModalVisible={setModalVisible} setModalResumeData={setModalResumeData} setModalMode={setModalMode}/>} />
                 {modalResumeData ? (
                 <Modal
                 animationType="slide"
@@ -74,39 +139,100 @@ export default function Resume({ navigation }) {
                 transparent={true}
                 >
                     <Pressable style={{flex:1, backgroundColor:'transparent'}} onPress={()=>setModalVisible(false)}/>
+                    { modalMode === 'VIEW' ? (
                     <View style={Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android}>
                         <View style={styles.modal_resume_buttons}>
-                            <TouchableOpacity style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'gray'}]) : ([styles.resume_button_android, {backgroundColor: 'gray'}])}>
-                                <Text style={{color:'white'}}>임시저장</Text>
+                            <TouchableOpacity onPress={()=>{
+                                setModalMode('UPDATE');
+                            }} style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'skyblue'}]) : ([styles.resume_button_android, {backgroundColor: 'skyblue'}])}>
+                                <Text style={{color:'white'}}>수정</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={()=>{setModalVisible(false);}}
-                                style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'blue'}]) : ([styles.resume_button_android, {backgroundColor: 'blue'}])}>
-                                <Text style={{color:'white'}}>저장</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'red'}]) : ([styles.resume_button_android, {backgroundColor: 'red'}])}>
+                            <TouchableOpacity onPress={()=>{
+                                resumeDelete(modalResumeData.id);
+                            }}
+                            style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'red'}]) : ([styles.resume_button_android, {backgroundColor: 'red'}])}>
                                 <Text style={{color:'white'}}>삭제</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={()=>{
+                                setModalVisible(false);
+                            }} style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'gray'}]) : ([styles.resume_button_android, {backgroundColor: 'gray'}])}>
+                                <Text style={{color:'white'}}>닫기</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.modal_resume_title}>
                             <Text style={{marginLeft:3, marginBottom:3}}>제목</Text>
-                            <TextInput editable={isEditable}
-                            placeholder="ex) 보유 기술, 사용 언어, 자기소개 등\n다양한 내용을 입력하세요"
+                            <TextInput editable={false}
+                            placeholder={`이력서 ${modalResumeData.id}`}
                             style={styles.modal_resume_title_input} value={modalResumeData.title}/>
                         </View>
                         <View style={styles.modal_resume_content}>
                             <Text style={{marginLeft:3, marginBottom:3}}>내용</Text>
-                            <TextInput editable={isEditable} 
+                            <TextInput editable={false} 
                             placeholder="ex) 블로그, GitHub 등"
                             style={styles.modal_resume_input} value={modalResumeData.content}/>
                         </View>
                         <View style={styles.modal_resume_url}>
                             <Text style={{marginLeft:3,marginBottom:3}}>URL 링크</Text>
-                            <TextInput editable={isEditable} 
+                            <TextInput editable={false} 
                             style={styles.modal_resume_input} value={modalResumeData.url}/>
                         </View>
                         <View style={{flex: 0.6}}></View>
                     </View>
+                    ) : (
+                    <View style={Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android}>
+                        <View style={styles.modal_resume_buttons}>
+                            {/* <TouchableOpacity style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'gray'}]) : ([styles.resume_button_android, {backgroundColor: 'gray'}])}>
+                                <Text style={{color:'white'}}>임시저장</Text>
+                            </TouchableOpacity> */}
+                            <TouchableOpacity
+                            onPress={modalMode==='UPDATE' ? (()=> {
+                                    handleResumeUpdate(modalResumeData.id);
+                                }) : (() => {
+                                    handleResumePost();
+                                    })}
+                                // onPress={()=>{
+   
+                                // }}
+                                style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'blue'}]) : ([styles.resume_button_android, {backgroundColor: 'blue'}])}>
+                                <Text style={{color:'white'}}>저장</Text>
+                            </TouchableOpacity>
+                            {modalMode==='UPDATE' ? (
+                                <TouchableOpacity onPress={()=>{
+                                    resumeDelete(modalResumeData.id);
+                                    setModalVisible(false);
+                                }}
+                                style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'red'}]) : ([styles.resume_button_android, {backgroundColor: 'red'}])}>
+                                    <Text style={{color:'white'}}>삭제</Text>
+                                </TouchableOpacity>
+                            ): undefined }
+                            <TouchableOpacity onPress={()=>{
+                                setModalVisible(false);
+                            }} style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'gray'}]) : ([styles.resume_button_android, {backgroundColor: 'gray'}])}>
+                                <Text style={{color:'white'}}>닫기</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.modal_resume_title}>
+                            <Text style={{marginLeft:3, marginBottom:3}}>제목</Text>
+                            <TextInput onChangeText={(text) => handleResumeChange('title', text)}
+                            placeholder={`이력서 제목`}
+                            style={styles.modal_resume_title_input} value={modalResumeData.title}/>
+                        </View>
+                        <View style={styles.modal_resume_content}>
+                            <Text style={{marginLeft:3, marginBottom:3}}>내용</Text>
+                            <TextInput onChangeText={(text) => handleResumeChange('content', text)}
+                            placeholder="ex) 블로그, GitHub 등"
+                            style={styles.modal_resume_input} value={modalResumeData.content}/>
+                        </View>
+                        <View style={styles.modal_resume_url}>
+                            <Text style={{marginLeft:3,marginBottom:3}}>URL 링크</Text>
+                            <TextInput onChangeText={(text) => handleResumeChange('url', text)}
+                            placeholder="ex) http://github.com" keyboardType="url"
+                            style={styles.modal_resume_input} value={modalResumeData.url}/>
+                        </View>
+                        <View style={{flex: 0.6}}></View>
+                    </View>
+                    )}
+
                 </Modal>
                 
                 ):( undefined )}
@@ -115,15 +241,15 @@ export default function Resume({ navigation }) {
     )
 }
 
-const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, setModalResumeData }) => {
+const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, setModalResumeData, setModalMode }) => {
     const date = new Date(createDate);
     const currentDate = new Date();
-    const currentYear = date.getFullYear();
+    const currentYear = currentDate.getFullYear();
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
     const vintageDate = `${year}.${month}.${day}`
     const formattedDate = `${month}월 ${day}일 ${hours}:${minutes}`
 
@@ -146,7 +272,7 @@ const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, set
             console.log(error);
         }
     }
-    const resumeDetail = async(id) => {
+    const resumeDetail = async(id, modalMode = 'VIEW') => {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
             axios.get(`${API_URL}/api/auth/resume/${id}`, {
@@ -163,10 +289,11 @@ const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, set
                     createDate: result.createDate,
                     id: result.id,
                 })
+                setModalMode(modalMode);
                 setModalVisible(true);
             })
             .catch(err=>{
-                Alert.alert('경고', '문제가 발생했습니다.');
+                // Alert.alert('경고', '문제가 발생했습니다.');
             })
         } catch (error){
             console.log(error);
@@ -183,7 +310,7 @@ const ResumeItem = ({ title, createDate, id, getResumeList, setModalVisible, set
                 </View>
             </View>
             <View style={{flexDirection:'row', justifyContent:'space-around'}}>
-                <TouchableOpacity style={[styles.resume_button, {height:hp('5%')}]}>
+                <TouchableOpacity style={[styles.resume_button, {height:hp('5%')}]} onPress={()=>{resumeDetail(id, 'UPDATE')}}>
                     <Text>수정</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.resume_button, {height:hp('5%')}]}
@@ -230,6 +357,7 @@ const styles = StyleSheet.create({
         marginBottom: '-10%',
         padding:'8%',
         position:'absolute',
+        width:'100%'
     },
     modal_container_ios:{
         backgroundColor:'white',
@@ -242,6 +370,7 @@ const styles = StyleSheet.create({
         marginBottom: '-10%',
         position:'absolute',
         padding:'8%',
+        width:'100%'
     },
     modal_view:{
         flex: 1,

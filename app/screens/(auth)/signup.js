@@ -6,7 +6,8 @@ import * as Progress from 'react-native-progress';
 import DefaultLayout from "../../layout/keyboardlayout";
 import axios from "axios";
 import KeyboardLayout from "../../layout/keyboardlayout";
-
+import { Picker } from "@react-native-picker/picker";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 const API_URL = process.env.API_URL;
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -21,6 +22,7 @@ export function Step1Screen({navigation}) {
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [isCodeEmpty, setIsCodeEmpty] = useState(true);
     const [isWrong, setIsWrong] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
 
     // 4글자 인증번호를 채우지 않으면 확인이 활성화되지 않음.
     useEffect(()=>{
@@ -71,6 +73,7 @@ export function Step1Screen({navigation}) {
         inputRef.current.focus();
     }
     const handleCodeSend = () => {
+        setIsPressed(true);
         if (email === '') { // 이메일 빈칸인지 아닌지 확인
             return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '이메일을 입력해주세요.'});
             // return Alert.alert('경고', '이메일을 입력해주세요.');
@@ -80,15 +83,54 @@ export function Step1Screen({navigation}) {
             // return Alert.alert('경고', '영문, 숫자만 입력 가능합니다.')
         }
         // **백엔드** 인증코드 보내기
-        //성공 시
-        setIsCodeSent(true);
-        setIsActive(true);
-        navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요'});
+        try{
+            axios.post(`${API_URL}/api/email`, {email:`${email}@mju.ac.kr`}, {
+                headers: {'Content-Length':'application/json'}
+            })
+            .then(res => {
+                const result = res.data;
+                console.log(res.data);
+                setIsCodeSent(true);
+                setIsActive(true);
+                //성공 시
+                navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요'});
+                setIsPressed(false);
+            })
+            .catch(err=>{
+                setIsPressed(false);
+            })
+        } catch(err){
+            console.log(err);
+        }
         // Alert.alert('안내', '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
         //실패 시
         //return Alert.alert('오류', '전송에 실패하였습니다.');
     }
     const handleResendCode = () => {
+        if (email === '') { // 이메일 빈칸인지 아닌지 확인
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '이메일을 입력해주세요.'});
+            // return Alert.alert('경고', '이메일을 입력해주세요.');
+        }
+        if (!regex.test(email)) { // 한글, 특수문자 방지
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '영문, 숫자만 입력 가능합니다.'});
+            // return Alert.alert('경고', '영문, 숫자만 입력 가능합니다.')
+        }
+        // **백엔드** 인증코드 보내기
+        try{
+            axios.post(`${API_URL}/api/email`, {email:`${email}@mju.ac.kr`}, {
+                headers: {'Content-Length':'application/json'}
+            })
+            .then(res => {
+                const result = res.data.data;
+                console.log(result);
+                setIsCodeSent(true);
+                setIsActive(true);
+                //성공 시
+                navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '인증번호를 전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요'});
+            })
+        } catch(err){
+            console.log(err);
+        }
         setCode('');
         //이메일 인증번호 재전송 코드
         resetTimer();
@@ -96,36 +138,40 @@ export function Step1Screen({navigation}) {
         // Alert.alert('안내', '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
     }
     const handleVerifyCode = () => {
+        try{
+            axios.post(`${API_URL}/api/email/verify`,{email:`${email}@mju.ac.kr`, code:code}, {
+                headers: {"Content-Type":'application/json'}
+            })
+            .then(res=>{
+                const result = res.data;
+                console.log(result);
+                navigation.navigate('Step2', {
+                    email: email, 
+                });
+                setIsWrong(false);
+            })
+            .catch(err => {
+                setCode('');
+                setIsWrong(true);
+                navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '인증번호가 일치하지 않습니다.'});
+                // return Alert.alert('경고', '인증번호가 일치하지 않습니다.');
+            })
+        }catch(err){
+            console.log(err);
+        }
         // **백엔드** 코드가 우리가 보낸값과 일치하는지 확인
-        if (code === '9999') {
-            navigation.navigate('Step2', {
-                email: email, 
-            });
-            setIsWrong(false);
-        }
-        else {
-            setCode('');
-            setIsWrong(true);
-            navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '인증번호가 일치하지 않습니다.'});
-            // return Alert.alert('경고', '인증번호가 일치하지 않습니다.');
-        }
-
     }
     return (
-        <KeyboardLayout>
-            <>
-                <Progress.Bar
-                style={styles.progress} progress={0.33}
-                width={SCREEN_WIDTH} height={10}
-                animated={true} 
-                color={'#002E66'}/>
+        <>
+            <Progress.Bar style={styles.progress} progress={0.33} width={SCREEN_WIDTH} height={10} animated={true} color={'#002E66'}/>
+            <KeyboardLayout>
                 <View style={styles.container}>
                     <StatusBar style='auto' />
                     <View style={styles.top_blank}></View>
                     <View style={styles.icon_container}>
                         <Image
                             style={styles.myongji_icon}
-                            source={require('../../../assets/myongji-icon.png')} />
+                            source={require('../../../assets/myongjicamp-title.png')} />
                     </View>
                     <View style={styles.text_container}>
                         <Text style={styles.text}>학교 인증을 완료해주세요.</Text>
@@ -177,6 +223,7 @@ export function Step1Screen({navigation}) {
                         </>) :
                         (<View style={styles.button_container}>
                             <TouchableOpacity
+                                disabled={isPressed}
                                 activeOpacity={0.7}
                                 style={styles.email_send_button}
                                 onPress={handleCodeSend}><Text style={styles.send_button_text}>인증번호 보내기</Text>
@@ -184,8 +231,8 @@ export function Step1Screen({navigation}) {
                         </View>)}
                     <View style={styles.bottom_blank}></View>
                 </View>
-            </>
-        </KeyboardLayout>
+            </KeyboardLayout>
+        </>
     )
 }
 export function Step2Screen({ route, navigation }) {
@@ -241,7 +288,7 @@ export function Step2Screen({ route, navigation }) {
                 <View style={styles.icon_container}>
                     <Image
                         style={styles.myongji_icon}
-                        source={require('../../../assets/myongji-icon.png')} />
+                        source={require('../../../assets/myongjicamp-title.png')} />
                 </View>
                 <View style={styles.text_container}>
                     <Text style={styles.text}>안전한 비밀번호를 만들어주세요.</Text>
@@ -290,6 +337,15 @@ export function Step3Screen({route, navigation}) {
         setChecked(false);
     }, [nickname])
 
+    const profileIcons = [
+        {id: 1, name: 'red', image: require('../../../assets/icon/profile-icon-1.png')},
+        {id: 2, name: 'green', image: require('../../../assets/icon/profile-icon-2.png')},
+        {id: 3, name: 'blue', image: require('../../../assets/icon/profile-icon-3.png')},
+        {id: 4, name: 'purple', image: require('../../../assets/icon/profile-icon-4.png')},
+        {id: 5, name: 'pink', image: require('../../../assets/icon/profile-icon-5.png')},
+    ]
+    const [ profileIcon, setProfileIcon ] = useState({id: 1, name: 'red', image: require('../../../assets/icon/profile-icon-1.png')});
+
     const handleNicknameCheck = () => {
         if (nickname === ''){
             return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '닉네임을 입력해주세요.'});
@@ -319,7 +375,7 @@ export function Step3Screen({route, navigation}) {
             email: `${email}@mju.ac.kr`,
             password: password,
             nickname: nickname,
-            profileIcon: "1",
+            profileIcon: profileIcon.id,
         }
         console.log(userData);
         axios.post(`${API_URL}/api/members`,
@@ -332,12 +388,13 @@ export function Step3Screen({route, navigation}) {
                 index: 0,
                 routes: [{ name: 'Login' }],
             })
-            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '회원가입에 성공했습니다.'});
-            // Alert.alert('안내', '회원가입에 성공했습니다.');
+            //성공해도 Login창에서 authlayout 거치느라 modal이 바로 닫힘.
+            // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: '회원가입에 성공했습니다.'});
+            Alert.alert('안내', '회원가입에 성공했습니다.');
         })
         .catch(error => {
             const result = error.response.data;
-            console.log('너 틀림', result);
+            // console.log('너 틀림', result);
             return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: result.data});
             // return Alert.alert('경고', result.data);
         })
@@ -349,13 +406,22 @@ export function Step3Screen({route, navigation}) {
             style={styles.progress}
             progress={progress} width={SCREEN_WIDTH} height={10} animated={true}
             color={'#002E66'} />
-            <View style={styles.container}>
+            <View style={[styles.container, {alignItems:'center'}]}>
                 <StatusBar style="auto"/>
                 <View style={styles.top_blank}></View>
-                <View style={styles.icon_container}>
-                    <Image
-                    style={styles.myongji_icon}
-                    source={require('../../../assets/myongji-icon.png')} />
+                <View style={[styles.icon_container, { marginBottom:hp('5%'), width:hp('20%')}]}>
+                    <Image source={profileIcon.image} style={{borderRadius:100, width:hp('20%'), height:hp('20%')}}/>
+                    <Picker
+                    style={{width:'100%', height:'90%', opacity:0, position:'absolute'}}
+                    selectedValue={profileIcon.id}
+                    onValueChange={(value) => {
+                        const selectedIcon = profileIcons.find((icon) => icon.id === value);
+                        setProfileIcon(selectedIcon);
+                    }}>
+                    {profileIcons.map((icon) => (
+                        <Picker.Item key={icon.id} label={icon.name} value={icon.id} />
+                    ))}
+                    </Picker>
                 </View>
                 <View style={styles.nickname_container}>
                     <TextInput
@@ -405,7 +471,7 @@ const styles = StyleSheet.create({
     button_container: {flex: 3, justifyContent: 'center', alignItems: 'center'},
     top_blank:{flex: 5,},
     bottom_blank:{flex: 8,},
-    myongji_icon: {},
+    myongji_icon: {objectFit:'scale-down', flex:1},
     text: {fontSize: 18},
     email_box: { 
         height: 50,

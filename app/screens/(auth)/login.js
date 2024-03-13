@@ -9,6 +9,8 @@ import axios, { Axios, AxiosError } from 'axios';
 import AuthLayout from '../../layout/authlayout';
 import { useAlert } from '../../hook/usealert';
 import KeyboardLayout from '../../layout/keyboardlayout';
+import { Base64, decode } from 'js-base64';
+import { Buffer } from 'buffer';
 const API_URL = process.env.API_URL;
 
 // 드래그 & ctrl alt l -> 자동 정렬
@@ -32,6 +34,7 @@ export default function Login({ navigation, route }) {
             username: `${emailPrefix}@mju.ac.kr`,
             password: password,
         }
+        try{
         axios.post(`${API_URL}/api/login`,
         userData, { headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -41,19 +44,26 @@ export default function Login({ navigation, route }) {
             const result = res.data;
             // 비동기저장소에 토큰, 세션 정보 저장
             const token = result.data.token;
+            // const decoded = Base64.fromBase64(token);
+            const decoded = Buffer.from(token, 'base64').toString('ascii');
+            // console.log(decoded);
+            const decoded1 = decoded.split(',"userId":')[1];
+            const userId = decoded1.split(',"iat"')[0];
+
             const refresh = result.data.refreshToken;
             // const tokenExp = new Date(new Date().getTime() + 30 * 1000); //만료 테스트 30초
             const tokenExp = new Date(new Date().getTime() + 60 * 1000 * 60 * 12); //실제 만료 12시간 - authlayout이랑 연결됨
             // const refreshExp = new Date(new Date().getTime() + 10 * 1000); //리프레시 테스트 10초
             const refreshExp = new Date(new Date().getTime() + 60 * 1000 * 60 * 5); //5시간을 만료갱신 기준으로 삼을 예정
             const loginData = {
+                userId: parseInt(userId),
                 token: token,
                 refresh: refresh,
                 session: (stayLoggedIn ? true : undefined),
                 tokenExp: tokenExp.toISOString(),
                 refreshExp: refreshExp.toISOString()
             }
-            console.log(loginData);
+            // console.log(loginData);
             await AsyncStorage.setItem('token', JSON.stringify(loginData));
             // Alert.alert('로그인 성공', result.data.message);
             navigation.reset({
@@ -65,17 +75,22 @@ export default function Login({ navigation, route }) {
         //에러 핸들링
         .catch (error => {
             const result = error.response.data;
-            console.log(result);
+            // console.log(result);
             navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
-            Alert.alert('로그인 실패', result.data);
+            // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: error});
+            // Alert.alert('로그인 실패', result.data);
             setPassword('');
         })
         .then (setLoginDisable(false))
+        } catch(err) {
+            // console.log(err)
+        };
     }
 
     // 비밀번호 찾기 버튼 눌렀을 때
     const handleFindPassword = () => {
-        Alert.alert('비밀번호를 찾습니다');
+        navigation.navigate('PwFind');
+        // Alert.alert('비밀번호를 찾습니다');
     }
 
     // 앱 둘러보기 버튼 눌렀을 때
@@ -92,7 +107,7 @@ export default function Login({ navigation, route }) {
                     <View style={styles.icon}>
                         <Image
                             style={styles.myongji_icon}
-                            source={require('../../../assets/myongji-icon.png')} />
+                            source={require('../../../assets/myongjicamp-title.png')} />
                     </View>
                     <View style={styles.input}>
                         <View style={styles.input_box}>
@@ -184,7 +199,6 @@ const styles = StyleSheet.create({
         flex: 2.5,
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     myongji_icon: {
         height: 130,

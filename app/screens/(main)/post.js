@@ -1,4 +1,4 @@
-import { Alert, FlatList, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, BackHandler, FlatList, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import DefaultLayout from "../../layout/keyboardlayout";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -63,7 +63,7 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
     return (
         <>
         {roleData.map((value, index) => {
-            if (index<2) {
+            if (index<1) {
                 return (
                     <View style={[styles.role_item, {height:hp('8%')}]} key={index}>
                          <Picker
@@ -71,9 +71,7 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
                             selectedValue={value.role}
                             onValueChange={(itemValue, itemIndex) => { setRoleData((prev) => {
                                 return prev.map((v, i) => {
-                                    if (i === index) {
-                                        return { ...v, role: itemValue }
-                                    }
+                                    if (i === index) { return { ...v, role: itemValue }}
                                     return v;
                                 });
                             })}}>
@@ -100,7 +98,7 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
                             onChangeText={(text) => handleNumberChange('requiredNumber', index, text)}
                             onSubmitEditing={() => handleNext2(index+1)}/>
                         </View>
-                        <TouchableOpacity style={styles.role_delete} activeOpacity={0.7} onPress={()=>handleRoleDelete(index)}>
+                        <TouchableOpacity style={styles.role_delete} activeOpacity={0.7}>
                             <FontAwesome6 name="trash-can" size={20} color="lightgray" />
                         </TouchableOpacity>
                     </View>
@@ -154,8 +152,11 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
 }
 
 export default function Post({navigation, route}) {
-    const [viewHeight, setViewHeight] = useState(138);
-
+    // useEffect(()=>{
+    //     const backHandler = BackHandler.addEventListener('hardwareBackPress', navigation.goBack)
+    //     return () => backHandler.remove();
+    // },[])
+    const [viewHeight, setViewHeight] = useState(130);
     const [postTitle, setPostTitle] = useState('');
     const [postContent, setPostContent] = useState('');
     const [postLocation, setPostLocation] = useState('');
@@ -164,7 +165,7 @@ export default function Post({navigation, route}) {
 
 
     //백엔드에서 get으로 받아와서 set해줘야됨
-    const [roleData, setRoleData] = useState([{role:'FRONT', appliedNumber:'', requiredNumber:''}, {role:'BACK', appliedNumber:'', requiredNumber:''}]);
+    const [roleData, setRoleData] = useState([{role:'FRONT', appliedNumber:'', requiredNumber:''}]);
 
     const handleRoleAdd = () => {
         setViewHeight(prev=>prev+8)
@@ -173,21 +174,38 @@ export default function Post({navigation, route}) {
 
     const postWrite = async() => {
         if (postTitle.length < 1 || postContent.length < 1 || postLocation.length < 1 || postDuration.length < 1) {
-            return Alert.alert('경고', '빈칸을 채워주세요.');
+            return navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:'빈칸을 채워주세요.'})
+            // return Alert.alert('경고', '빈칸을 채워주세요.');
         }
     
-        const roleCheck = new Set(roleData);
+        let roleCheck = new Set();
+        roleData.map((role)=>roleCheck.add(role.role))
         if (roleCheck.size !== roleData.length) {
             return navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:'직무는 중복선택 할 수 없습니다.'})
         }
 
         let flag = false;
+        let count = 0;
         roleData.map((value) => {
             if (value.appliedNumber > value.requiredNumber) {
                 flag = true;
                 return navigation.navigate('ModalLayout', { component: 'MyAlert', title: '안내', message: '현재인원은 필요인원보다 클 수 없습니다.' });
             }
+            if (value.requiredNumber === '' || value.requiredNumber === 0){
+                flag = true;
+                return navigation.navigate('ModalLayout', { component: 'MyAlert', title: '안내', message: '필요인원은 0이 될 수 없습니다.' });
+            }
+            if (value.appliedNumber === ''){
+                value.appliedNumber = 0;
+            }
+            if (value.requiredNumber === value.appliedNumber) {
+                count += 1;
+            }
         })
+        if (!flag && roleData.length === count) {
+            flag = true;
+            return navigation.navigate('ModalLayout', { component: 'MyAlert', title: '안내', message: '모든 인원이 꽉 차 있습니다.' });
+        }
 
         const postData = {
           title: postTitle,
@@ -202,24 +220,27 @@ export default function Post({navigation, route}) {
         if (!flag) {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            const res = await axios.post(`${API_URL}/api/auth/recruit`, postData, {
+            axios.post(`${API_URL}/api/auth/recruit`, postData, {
                 headers : {
                     'Content-Type':'application/json',
                     Authorization: `Bearer ${token.token}`,
                 }
-            });
-            const result = res.data.data;
-            console.log(res.data);
-            if (res.data.status === 200) {
+            })
+            .then(res => {
+                const result = res.data.data;
+                console.log(res.data);
                 navigation.pop(); //나중에 바꿔줘야함
                 navigation.navigate('ModalLayout', {component: 'MyAlert', title:'안내', message: result});
-                // Alert.alert('안내', result);
-            } else {
-                navigation.navigate('ModalLayout', {component: 'MyAlert', title:'경고', message: result});
-                // Alert.alert('경고', result);
-            }
+            })
+            .catch(err => {
+                // const result = err.response.data;
+                // navigation.navigate('ModalLayout', {component: 'MyAlert', title:'경고', message: result});
+            })
+            .then(()=>{
+                
+            })
         }catch(error){
-            console.log(error);
+            // console.log(error);
         }
         }
       };

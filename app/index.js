@@ -1,8 +1,12 @@
 import { Link } from "expo-router";
-import { Text, StyleSheet, View } from "react-native";
+import { Text, StyleSheet, View, BackHandler, ToastAndroid, LogBox } from "react-native";
 import Navigation from "./navigation";
+import { useEffect, useRef } from "react";
 
 export default function App(){
+    LogBox.ignoreLogs([
+        'Non-serializable values were found in the navigation state'
+    ])
     return (
         <Navigation/>
     )
