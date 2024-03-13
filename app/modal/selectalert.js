@@ -72,7 +72,7 @@ const deletePost = async(boardId, navigation) => {
             navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result.data});
         })
         .catch(err => {
-            console.log('postdetail delete error:',err);
+            // console.log('postdetail delete error:',err);
         })
     }catch (err) {console.log('token get err')};
 }
@@ -95,7 +95,7 @@ const updatePost = async(boardId, modalData, navigation) => {
             }
         })
         .then(res => {
-            // console.log(res.data);
+            console.log(res.data);
             const result = res.data;
             // setUpdateMode(false);
             navigation.goBack();

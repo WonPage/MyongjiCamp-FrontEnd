@@ -17,7 +17,7 @@ export const useComment = () => {
             const result = response.data.data;
             return result;
         } catch (error) {
-            console.log('댓글 목록 가져오기 오류:', error);
+            // console.log('댓글 목록 가져오기 오류:', error);
             // 상황에 맞는 에러 처리, 예: 사용자에게 에러 메시지 보여주기
         }
     };
@@ -35,7 +35,7 @@ export const useComment = () => {
             const result = response.data;
             // navigation.navigate('ModalLayout', { component: 'MyAlert', title: '안내', message: result.data });
         } catch (error) {
-            // console.error('댓글 작성 오류:', error);
+            console.error('댓글 작성 오류:', error);
             // 상황에 맞는 에러 처리, 예: 사용자에게 에러 메시지 보여주기
         }
     };

@@ -46,7 +46,7 @@ export default function OnGoing({navigation, route}) {
                 setPage(page+1);
             })
             .catch(error => {
-                // console.log(error);
+                console.log(error);
             })
             } catch(err){console.log(err)};
         }

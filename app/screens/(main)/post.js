@@ -233,7 +233,7 @@ export default function Post({navigation, route}) {
                 navigation.navigate('ModalLayout', {component: 'MyAlert', title:'안내', message: result});
             })
             .catch(err => {
-                // const result = err.response.data;
+                const result = err.response.data;
                 // navigation.navigate('ModalLayout', {component: 'MyAlert', title:'경고', message: result});
             })
             .then(()=>{

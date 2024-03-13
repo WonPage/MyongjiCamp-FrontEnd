@@ -55,7 +55,7 @@ export default function AuthLayout({children, navigation, route}) {
                     });
                 })
                 .catch(err=>{
-                    console.log(err);
+                    // console.log(err);
                 })
             }
             // 4. 세션이 존재하고 만료일이 지남

@@ -55,7 +55,7 @@ export default function PostDetail({ navigation, route }) {
                 setPostData(res.data.data);
             })
             .catch(err => {
-                // console.log('postdetail error:',err);
+                console.log('postdetail error:',err);
             })
         }catch (err) {console.log('token get err:')};
 
@@ -70,7 +70,7 @@ export default function PostDetail({ navigation, route }) {
                 // console.log(res.data.data);
                 setIsScrap(res.data.data);
             })
-            .catch(console.log);
+            // .catch(console.log);
         }
         catch (err) {
             // console.log(err);
@@ -291,7 +291,7 @@ function Detail({userId, setDuration, iconPath, boardId, postData, isScrap, getP
                 // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result});
             })
             .catch(err => {
-                console.log(err);
+                // console.log(err);
             })
         }catch(err) {console.log(err)}
     }
@@ -466,7 +466,7 @@ const CommentPush = ({getComment, writeComment, setCommentList, scrollRef}) => {
             // console.error('댓글 작성 오류:', error)
         })
         .then(() => {
-            scrollRef.current.scrollToEnd({ animated: true });
+            // scrollRef.current.scrollToEnd({ animated: true });
         })
     }
     return (

@@ -20,7 +20,7 @@ export default function Resume({ navigation }) {
             setResumeList(res.data.data);
         })
         .catch(err => {
-            // console.log(err)
+            console.log(err)
         });
     }
     useEffect(()=>{

@@ -38,7 +38,7 @@ export default function PwChange(){
                 setIsChecked(true);
             })
         }catch{
-            console.log;
+            // console.log;
         }
     }
     const handlePwChange = async() => {
@@ -65,11 +65,12 @@ export default function PwChange(){
                 })
                 .then(res => {
                     const result = res.data;
+                    // console.log(result);
                     navigation.pop();
-                    navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result.data});
+                    navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:'비밀번호가 변경되었습니다.'});
                 })
             }catch{
-                console.log;
+                // console.log;
             }
         }
     }

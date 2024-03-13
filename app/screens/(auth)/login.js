@@ -74,9 +74,9 @@ export default function Login({ navigation, route }) {
         })
         //에러 핸들링
         .catch (error => {
-            const result = error.response.data;
+            // const result = error.response.data;
             // console.log(result);
-            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
+            // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
             // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: error});
             // Alert.alert('로그인 실패', result.data);
             setPassword('');
