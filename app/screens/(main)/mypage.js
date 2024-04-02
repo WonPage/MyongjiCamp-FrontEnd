@@ -11,7 +11,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import KeyboardLayout from "../../layout/keyboardlayout";
 import { Octicons, SimpleLineIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-const API_URL = process.env.API_URL;
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function MyPage({navigation, route}) {
     const iconPath = {
         1 : require('../../../assets/icon/profile-icon-1.png'),
@@ -24,30 +24,29 @@ export default function MyPage({navigation, route}) {
     const [nicknameModalVisible, setNicknameModalVisible] = useState(false);
     const [newNickname, setNewNickname] = useState('');
     const getProfile = async() => {
-        // try{
+        try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.get(`${API_URL}/api/auth/profile`, {
+            axios.get(`${EXPO_PUBLIC_API_URL}/api/auth/profile`, {
                 headers: {Authorization: `Bearer ${token.token}`}
             })
             .then(res =>{
                 const result = res.data.data;
-                // console.log(result);
                 setUserData(result);
                 setIcon(res.data.data.profileIcon);
                 setNewNickname(res.data.data.nickname);
             })
             .catch(err=>{
-                console.log('여기다 바보야', err)
+                // console.log('여기다 바보야', err)
             })
-        // }catch(err) {
-        //     console.log(err)
-        // }
+        }catch(err) {
+            console.log(err)
+        }
     }
     const nicknameChange = async() => {
         console.log(newNickname);
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.put(`${API_URL}/api/auth/nickname/update`, {
+            axios.put(`${EXPO_PUBLIC_API_URL}/api/auth/nickname/update`, {
                 nickname:newNickname,
             },{
                 headers: {
@@ -62,7 +61,7 @@ export default function MyPage({navigation, route}) {
                 // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
             })
             .catch(err => {
-                console.log(err);
+                // console.log(err);
             })
         }catch(err) {console.log(err)}
     }
@@ -88,9 +87,9 @@ export default function MyPage({navigation, route}) {
         if (userData?.profileIcon === iconId) {
             return;
         }
-        // try{
+        try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.put(`${API_URL}/api/auth/icon/update`, {
+            axios.put(`${EXPO_PUBLIC_API_URL}/api/auth/icon/update`, {
                 profileIcon:iconId,
             },{
                 headers: {
@@ -99,7 +98,8 @@ export default function MyPage({navigation, route}) {
                 }
             })
             .then(async(res) =>{
-                const newToken = res.data.data.token;
+                // console.log(res.data);
+/*                 const newToken = res.data.data.token;
                 const newTokenData = {
                     userId: token.userId,
                     token: newToken,
@@ -108,7 +108,8 @@ export default function MyPage({navigation, route}) {
                     tokenExp: token.tokenExp,
                     refreshExp: token.refreshExp,
                 }
-                await AsyncStorage.mergeItem('token', JSON.stringify(newTokenData));
+                // AsyncStorage.clear();
+                await AsyncStorage.mergeItem('token', JSON.stringify(newTokenData)); */
                 getProfile();
                 // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
             })
@@ -116,11 +117,10 @@ export default function MyPage({navigation, route}) {
                 console.log(err.response.data);
             })
             .then(()=>{
-                getProfile();
             })
-        // } catch(err){
-        //     console.log(err);
-        // }
+        } catch(err){
+            console.log(err);
+        }
     }
     useEffect(()=>{
         getProfile();
@@ -137,8 +137,7 @@ export default function MyPage({navigation, route}) {
                         selectedValue={icon}
                         style={{width:'100%', height:'100%', opacity:0, position:'absolute'}}
                         onValueChange={(iconId) => {
-                            console.log(iconId);
-                            setIcon(iconId);
+                            // console.log(iconId);
                             profileChange(iconId);
                         }}>
                         {profileIcons.map((icon, index) => (
@@ -206,7 +205,7 @@ const Item = ({title, page, navigation}) => {
             <TouchableOpacity style={styles.page_item} onPress={async()=>{
                 const token = JSON.parse(await AsyncStorage.getItem('token'));
                 // console.log(token);
-                axios.post(`${API_URL}/api/auth/logout`, {}, {
+                axios.post(`${EXPO_PUBLIC_API_URL}/api/auth/logout`, {}, {
                     headers:{'Content-Type':'application/json', Authorization: `Bearer ${token.token}`}
                 })
                 .then(res => {

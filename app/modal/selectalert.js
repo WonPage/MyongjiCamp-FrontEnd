@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function SelectAlert({afterAction, navigation, title, message, action, data}){
     const handleAcceptAction = () => {
@@ -17,6 +17,10 @@ export default function SelectAlert({afterAction, navigation, title, message, ac
             }
             case 'deleteComment' : {
                 deleteComment(data.boardId, data.commentId, navigation);
+                break;
+            }
+            case 'completeRecruit' : {
+                completeRecruit(data.boardId, data.postData, navigation);
                 break;
             }
         }
@@ -34,6 +38,10 @@ export default function SelectAlert({afterAction, navigation, title, message, ac
                 break;
             }
             case 'deleteComment' : {
+                navigation.goBack();
+                break;
+            }
+            case 'completeRecruit' : {
                 navigation.goBack();
                 break;
             }
@@ -72,7 +80,7 @@ const deletePost = async(boardId, navigation) => {
             navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result.data});
         })
         .catch(err => {
-            // console.log('postdetail delete error:',err);
+            console.log('postdetail delete error:',err);
         })
     }catch (err) {console.log('token get err')};
 }
@@ -99,6 +107,7 @@ const updatePost = async(boardId, modalData, navigation) => {
             const result = res.data;
             // setUpdateMode(false);
             navigation.goBack();
+            navigation.navigate('Root');
             navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
         })
     }catch(err){console.log(err)};
@@ -120,6 +129,33 @@ const deleteComment = async(boardId, commentId, navigation) => {
             console.log('delete comment error:',err);
         })
     }catch (err) {console.log('token get err:')};
+}
+
+const completeRecruit = async(boardId, postData, navigation) => {
+    try{
+        const token = JSON.parse(await AsyncStorage.getItem('token'));
+        console.log(postData);
+        const putData = {
+            title: postData.title,
+            content: postData.content,
+            status: "RECRUIT_COMPLETE",
+            preferredLocation: postData.preferredLocation,
+            expectedDuration: postData.expectedDuration,
+            roleAssignments: postData.roleAssignments
+        }
+        axios.put(`${API_URL}/api/auth/recruit/${boardId}`, putData, {
+            headers: {
+                'Content-Type':'application/json',
+                Authorization: `Bearer ${token.token}`,
+            }
+        })
+        .then(res => {
+            const result = res.data;
+            // console.log(result);
+            navigation.goBack();
+            navigation.navigate('Complete');
+        })
+    }catch(err){console.log}
 }
 
 const styles = StyleSheet.create({

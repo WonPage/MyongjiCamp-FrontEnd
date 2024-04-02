@@ -9,7 +9,7 @@ import { useAlert } from "../../hook/usealert";
 import Loading from "../(other)/loading";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function OnGoing({navigation, route}) {
     const [onGoingList, setOnGoingList] = useState();
@@ -31,7 +31,7 @@ export default function OnGoing({navigation, route}) {
                 setOnGoingList(result.data);
             })
             .catch(error => {
-                console.log(error);
+                // console.log(error);
                 // const result = error.response.data;
                 // console.log('Home Render Failed :', error);
             })
@@ -46,7 +46,7 @@ export default function OnGoing({navigation, route}) {
                 setPage(page+1);
             })
             .catch(error => {
-                console.log(error);
+                // console.log(error);
             })
             } catch(err){console.log(err)};
         }

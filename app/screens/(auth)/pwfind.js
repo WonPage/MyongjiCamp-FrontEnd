@@ -4,7 +4,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import KeyboardLayout from "../../layout/keyboardlayout";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function PwFind() {
     const navigation = useNavigation();
@@ -36,6 +36,7 @@ export default function PwFind() {
                 setIsPressed(false);
             })
             .catch(err => {
+                console.log(err);
                 setIsPressed(false);
             })
         } catch(err){

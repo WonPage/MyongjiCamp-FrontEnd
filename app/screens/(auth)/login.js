@@ -11,7 +11,7 @@ import { useAlert } from '../../hook/usealert';
 import KeyboardLayout from '../../layout/keyboardlayout';
 import { Base64, decode } from 'js-base64';
 import { Buffer } from 'buffer';
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
@@ -74,9 +74,9 @@ export default function Login({ navigation, route }) {
         })
         //에러 핸들링
         .catch (error => {
-            // const result = error.response.data;
+            const result = error.response.data;
             // console.log(result);
-            // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
+            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
             // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: error});
             // Alert.alert('로그인 실패', result.data);
             setPassword('');

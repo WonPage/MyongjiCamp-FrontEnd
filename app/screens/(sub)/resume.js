@@ -2,10 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Alert, FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function Resume({ navigation }) {
     const [resumeList, setResumeList] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -85,7 +85,7 @@ export default function Resume({ navigation }) {
                 getResumeList();
             })
             .catch(error=> {
-                // console.log(error);
+                console.log(error);
                 Alert.alert('경고', '글 작성에 실패하였습니다.');
                 getResumeList();
             })
@@ -140,7 +140,7 @@ export default function Resume({ navigation }) {
                 >
                     <Pressable style={{flex:1, backgroundColor:'transparent'}} onPress={()=>setModalVisible(false)}/>
                     { modalMode === 'VIEW' ? (
-                    <View style={Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android}>
+                    <View style={[Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android, {height:hp('100%')}]}>
                         <View style={styles.modal_resume_buttons}>
                             <TouchableOpacity onPress={()=>{
                                 setModalMode('UPDATE');
@@ -179,7 +179,7 @@ export default function Resume({ navigation }) {
                         <View style={{flex: 0.6}}></View>
                     </View>
                     ) : (
-                    <View style={Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android}>
+                    <View style={[Platform.OS === 'ios' ? styles.modal_container_ios : styles.modal_container_android, {height:hp('100%')}]}>
                         <View style={styles.modal_resume_buttons}>
                             {/* <TouchableOpacity style={ Platform.OS==='ios' ? ([styles.resume_button_ios, {backgroundColor: 'gray'}]) : ([styles.resume_button_android, {backgroundColor: 'gray'}])}>
                                 <Text style={{color:'white'}}>임시저장</Text>
@@ -351,7 +351,6 @@ const styles = StyleSheet.create({
     modal_container_android:{
         backgroundColor:'white',
         elevation: 7,
-        height: '100%',
         borderRadius: 30, 
         marginTop: '18%', 
         marginBottom: '-10%',

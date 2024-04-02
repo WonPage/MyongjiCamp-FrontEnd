@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function SearchResult({navigation, route}){
     const [resultList, setResultList] = useState();
 
@@ -50,7 +50,7 @@ export default function SearchResult({navigation, route}){
             setResultList(result.data);
         })
         .catch(error => {
-            const result = error;
+            // const result = error;
             // const result = error.response.data;
             // console.log('실패', result);
         })

@@ -12,7 +12,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { usePOST } from "../../hook/useaxios";
 import { FontAwesome6 } from "@expo/vector-icons";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export function PostButton({navigation, route}){
     return (
@@ -233,7 +233,7 @@ export default function Post({navigation, route}) {
                 navigation.navigate('ModalLayout', {component: 'MyAlert', title:'안내', message: result});
             })
             .catch(err => {
-                const result = err.response.data;
+                // const result = err.response.data;
                 // navigation.navigate('ModalLayout', {component: 'MyAlert', title:'경고', message: result});
             })
             .then(()=>{
