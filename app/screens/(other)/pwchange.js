@@ -8,7 +8,7 @@ import { TextInput } from "react-native";
 import { useState } from "react";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function PwChange(){
     const navigation = useNavigation();
@@ -38,7 +38,7 @@ export default function PwChange(){
                 setIsChecked(true);
             })
         }catch{
-            console.log;
+            // console.log;
         }
     }
     const handlePwChange = async() => {
@@ -65,11 +65,12 @@ export default function PwChange(){
                 })
                 .then(res => {
                     const result = res.data;
+                    // console.log(result);
                     navigation.pop();
-                    navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result.data});
+                    navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:'비밀번호가 변경되었습니다.'});
                 })
             }catch{
-                console.log;
+                // console.log;
             }
         }
     }

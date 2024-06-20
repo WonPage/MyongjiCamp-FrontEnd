@@ -4,9 +4,10 @@ import { Base64 } from "js-base64";
 import { useEffect } from "react"
 import { Alert } from "react-native";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function AuthLayout({children, navigation, route}) {
     const authCheck = async() => {
+        // AsyncStorage.clear();
         const token = JSON.parse(await AsyncStorage.getItem('token'));
         // console.log(token);
         if (route.name === "Login") {

@@ -11,10 +11,7 @@ import { useAlert } from '../../hook/usealert';
 import KeyboardLayout from '../../layout/keyboardlayout';
 import { Base64, decode } from 'js-base64';
 import { Buffer } from 'buffer';
-import {RNEventSource,EventSourceListener} from "react-native-event-source";
-import EventSource from 'react-native-sse';
-
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66

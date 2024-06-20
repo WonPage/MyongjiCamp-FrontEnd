@@ -11,7 +11,6 @@ export default function App(){
         <Navigation/>
     )
 }
-
 const styles = StyleSheet.create({
     container:{
       flex: 1,

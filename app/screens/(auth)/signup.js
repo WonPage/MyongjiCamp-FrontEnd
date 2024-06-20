@@ -8,7 +8,7 @@ import axios from "axios";
 import KeyboardLayout from "../../layout/keyboardlayout";
 import { Picker } from "@react-native-picker/picker";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const Stack = createNativeStackNavigator();
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -138,9 +138,9 @@ export function Step1Screen({navigation}) {
         // Alert.alert('안내', '인증번호를 재전송했습니다.\n약 10초 후 입력된 이메일을 통해 인증번호를 확인해보세요.');
     }
     const handleVerifyCode = () => {
-        // return  navigation.navigate('Step2', {
+        // navigation.navigate('Step2', {
         //     email: email, 
-        // }); //임시
+        // });
         try{
             axios.post(`${API_URL}/api/email/verify`,{email:`${email}@mju.ac.kr`, code:code}, {
                 headers: {"Content-Type":'application/json'}
@@ -154,6 +154,7 @@ export function Step1Screen({navigation}) {
                 setIsWrong(false);
             })
             .catch(err => {
+                console.log(err);
                 setCode('');
                 setIsWrong(true);
                 navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: '인증번호가 일치하지 않습니다.'});

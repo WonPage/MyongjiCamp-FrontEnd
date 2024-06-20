@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useState } from "react";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export async function useGET(api_url, params = undefined){
     const searchParams = new URLSearchParams();
     if (params) {
@@ -48,7 +48,7 @@ export async function usePOST(api_url, body = {}){
         .catch(error => {
             const data = error.response.data;
             setResult(data);
-            // console.log('POST Error :', data);
+            console.log('POST Error :', data);
         })
         // .then(()=> { return result })
     } catch(error) {console.log('AsyncStorage Error :',error)};

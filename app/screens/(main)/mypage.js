@@ -11,7 +11,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import KeyboardLayout from "../../layout/keyboardlayout";
 import { Octicons, SimpleLineIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-const API_URL = process.env.API_URL;
+const EXPO_PUBLIC_API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function MyPage({navigation, route}) {
     const iconPath = {
         1 : require('../../../assets/icon/profile-icon-1.png'),
@@ -26,13 +26,13 @@ export default function MyPage({navigation, route}) {
     const getProfile = async() => {
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.get(`${API_URL}/api/auth/profile`, {
+            axios.get(`${EXPO_PUBLIC_API_URL}/api/auth/profile`, {
                 headers: {Authorization: `Bearer ${token.token}`}
             })
             .then(res =>{
                 const result = res.data.data;
-                console.log(result);
                 setUserData(result);
+                setIcon(res.data.data.profileIcon);
                 setNewNickname(res.data.data.nickname);
             })
             .catch(err=>{
@@ -46,7 +46,7 @@ export default function MyPage({navigation, route}) {
         console.log(newNickname);
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.put(`${API_URL}/api/auth/nickname/update`, {
+            axios.put(`${EXPO_PUBLIC_API_URL}/api/auth/nickname/update`, {
                 nickname:newNickname,
             },{
                 headers: {
@@ -61,13 +61,10 @@ export default function MyPage({navigation, route}) {
                 // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
             })
             .catch(err => {
-                console.log(err);
+                // console.log(err);
             })
         }catch(err) {console.log(err)}
     }
-    useEffect(()=>{
-        getProfile();
-    },[])
     const page_list = [
         {page:'Notice', title:'공지사항'},
         {page:'FAQ', title:'FAQ'},
@@ -84,13 +81,15 @@ export default function MyPage({navigation, route}) {
         {id: 4, name: 'purple', image: require('../../../assets/icon/profile-icon-4.png')},
         {id: 5, name: 'pink', image: require('../../../assets/icon/profile-icon-5.png')},
     ]
+    const [icon, setIcon] = useState();
     const profileChange = async(iconId) => {
+        // console.log(iconId, userData?.profileIcon);
         if (userData?.profileIcon === iconId) {
             return;
         }
         try{
             const token = JSON.parse(await AsyncStorage.getItem('token'));
-            axios.put(`${API_URL}/api/auth/icon/update`, {
+            axios.put(`${EXPO_PUBLIC_API_URL}/api/auth/icon/update`, {
                 profileIcon:iconId,
             },{
                 headers: {
@@ -99,27 +98,33 @@ export default function MyPage({navigation, route}) {
                 }
             })
             .then(async(res) =>{
-                const result = res.data.data;
-                const newToken = result.token;
-                console.log(token);
-                // const newTokenData = {
-                //     userId: token.userId,
-                //     token: newToken,
-                //     refresh: token.refresh,
-                //     session: token.session,
-                //     tokenExp: tokenExp.toISOString(),
-                //     refreshExp: refreshExp.toISOString()
-                // }
+                // console.log(res.data);
+/*                 const newToken = res.data.data.token;
+                const newTokenData = {
+                    userId: token.userId,
+                    token: newToken,
+                    refresh: token.refresh,
+                    session: (token.session ? true : undefined),
+                    tokenExp: token.tokenExp,
+                    refreshExp: token.refreshExp,
+                }
+                // AsyncStorage.clear();
+                await AsyncStorage.mergeItem('token', JSON.stringify(newTokenData)); */
                 getProfile();
                 // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message:result})
             })
             .catch(err => {
                 console.log(err.response.data);
             })
+            .then(()=>{
+            })
         } catch(err){
             console.log(err);
         }
     }
+    useEffect(()=>{
+        getProfile();
+    },[])
     return(
         <AuthLayout navigation={navigation} route={route}>
         <View style={[styles.container]}>
@@ -129,13 +134,17 @@ export default function MyPage({navigation, route}) {
                     <View style={{justifyContent:'center', alignItems:'center', width:hp('15%'), height:hp('15%'), marginLeft:hp('0.5%'), marginRight:hp('2%')}}>
                         {/* <Image source={profileIcon.image} style={{borderRadius:100, width:hp('20%'), height:hp('20%')}}/> */}
                         <Picker
-                        style={{width:'100%', height:'90%', opacity:0, position:'absolute'}}
-                        onValueChange={(iconId) => profileChange(iconId)}>
-                        {profileIcons.map((icon) => (
-                            <Picker.Item key={icon.id} label={icon.name} value={icon.id} />
+                        selectedValue={icon}
+                        style={{width:'100%', height:'100%', opacity:0, position:'absolute'}}
+                        onValueChange={(iconId) => {
+                            // console.log(iconId);
+                            profileChange(iconId);
+                        }}>
+                        {profileIcons.map((icon, index) => (
+                            <Picker.Item key={index} label={icon.name} value={icon.id} />
                         ))}
                         </Picker>
-                        <Image style={{borderRadius: 50}} source={iconPath[userData?.profileIcon]}/>
+                        <Image style={{borderRadius: 50}} source={iconPath[icon?icon:undefined]}/>
                     </View>
                 </View>
                 <View>
@@ -196,7 +205,7 @@ const Item = ({title, page, navigation}) => {
             <TouchableOpacity style={styles.page_item} onPress={async()=>{
                 const token = JSON.parse(await AsyncStorage.getItem('token'));
                 // console.log(token);
-                axios.post(`${API_URL}/api/auth/logout`, {}, {
+                axios.post(`${EXPO_PUBLIC_API_URL}/api/auth/logout`, {}, {
                     headers:{'Content-Type':'application/json', Authorization: `Bearer ${token.token}`}
                 })
                 .then(res => {
@@ -209,7 +218,7 @@ const Item = ({title, page, navigation}) => {
                     });
                 })
                 .catch(err => {
-                    // console.log(err);
+                    console.log(err);
                 })
             }}>
                 <Text style={styles.page_title}>{title}</Text>

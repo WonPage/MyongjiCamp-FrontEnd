@@ -12,7 +12,7 @@ import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { usePOST } from "../../hook/useaxios";
 import { FontAwesome6 } from "@expo/vector-icons";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export function PostButton({navigation, route}){
     return (
