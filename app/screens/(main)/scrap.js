@@ -16,7 +16,7 @@ export default function Scrap({navigation, route}) {
     try{
       const token = JSON.parse(await AsyncStorage.getItem('token'));
       axios.get(`${API_URL}/api/auth/scrap`, { 
-        headers: {Authorization: `Bearer ${token.token}`}
+        headers: {Authorization: `Bearer ${token.token}`,}
       })
       .then(res => {
         const result = res.data.data;

@@ -11,12 +11,76 @@ import { useAlert } from '../../hook/usealert';
 import KeyboardLayout from '../../layout/keyboardlayout';
 import { Base64, decode } from 'js-base64';
 import { Buffer } from 'buffer';
+import {RNEventSource,EventSourceListener} from "react-native-event-source";
+import EventSource from 'react-native-sse';
+
 const API_URL = process.env.API_URL;
 
 // 드래그 & ctrl alt l -> 자동 정렬
 // 학교 하늘 색 #008FD5, 남색 #002E66
 
+
 export default function Login({ navigation, route }) {
+    // useEffect(() => { //notification이 시작될 때 무조건 한 번은 켜지는 거
+
+        const connectToSse = async (token) => {
+            try {
+                const url = `${API_URL}/api/auth/noification/subscribe`
+                // const token = JSON.parse(await AsyncStorage.getItem('token'));
+                 const eventSource = new EventSource(url,{
+                    method:"GET",
+                    headers:{Authorization:`Bearer ${token}`},
+                }) 
+
+            /*      const eventSource = new RNEventSource(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                        
+                        // 'Last-Event-ID': lastEventId
+                    },
+                }) 
+                 */
+                console.log("tokenId ", token)
+                console.log("EVENTSOURCE ",eventSource)
+                eventSource.addEventListener('open', (event) => {
+                    console.log('event type', event.type); // message
+                    console.log( 'SSE 연결 알림', event.id);
+                });
+
+                eventSource.addEventListener('message', (event) => {
+                    // const data = event.data(parse,JSON) //이런거 필요한가? 일단 막 쓴 애
+                    console.log(event.data)
+                })
+
+                // data = event
+                eventSource.addEventListener('error', (error) => {
+
+                    console.log('try SSE 연결 오류', error);
+                    console.log('type 연결 오류', error.type);
+                    console.log('data 연결 오류', error.data);
+                    // console.log('lastEventId 연결 오류', error.lastEventId);
+                    console.log('origin연결 오류', error.origin);
+                //
+                //
+                })
+
+                eventSource.addEventListener('state',(event)=>{
+                    console.log('new State', event.data)
+                })
+
+
+                return () => { // component가 종료될 때 return 안에 있는 거를 시킴.
+                    eventSource.close() // 얘 위치 정해야 함
+                }
+            }
+            catch (error) {
+                console.log('catch SSE 연결 오류:', error);
+            }
+        }
+    // }, []) //[]이게 있으면 한 번, 이게 없으면 무한번, 안에 무언가 있으면 안에게 변할 때마다 실행
+
+
+
     const inputRef = useRef();
     const handleTextClick = () => {
         inputRef.current.focus();
@@ -41,12 +105,13 @@ export default function Login({ navigation, route }) {
         }})
         //성공 핸들링
         .then(async(res) => {
+
             const result = res.data;
             // 비동기저장소에 토큰, 세션 정보 저장
             const token = result.data.token;
             // const decoded = Base64.fromBase64(token);
             const decoded = Buffer.from(token, 'base64').toString('ascii');
-            // console.log(decoded);
+            console.log(decoded);
             const decoded1 = decoded.split(',"userId":')[1];
             const userId = decoded1.split(',"iat"')[0];
 
@@ -63,6 +128,9 @@ export default function Login({ navigation, route }) {
                 tokenExp: tokenExp.toISOString(),
                 refreshExp: refreshExp.toISOString()
             }
+            connectToSse(token); //sse 연결
+
+
             // console.log(loginData);
             await AsyncStorage.setItem('token', JSON.stringify(loginData));
             // Alert.alert('로그인 성공', result.data.message);
@@ -74,12 +142,12 @@ export default function Login({ navigation, route }) {
         })
         //에러 핸들링
         .catch (error => {
-            const result = error.response.data;
-            // console.log(result);
-            navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
+            // const result = error.response.data;
+            console.log(error);
+            // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: result.data});
             // navigation.navigate('ModalLayout', {component:'MyAlert', title:'안내', message: error});
             // Alert.alert('로그인 실패', result.data);
-            setPassword('');
+            // setPassword('');
         })
         .then (setLoginDisable(false))
         } catch(err) {

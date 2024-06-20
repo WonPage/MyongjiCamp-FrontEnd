@@ -36,7 +36,7 @@ export default function MyPage({navigation, route}) {
                 setNewNickname(res.data.data.nickname);
             })
             .catch(err=>{
-                // console.log('여기다 바보야', err)
+                console.log('여기다 바보야', err)
             })
         }catch(err) {
             console.log(err)

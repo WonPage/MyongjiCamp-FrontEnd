@@ -244,7 +244,7 @@ function DetailUpdate({boardId, setUpdateMode}) {
                     <RoleItem roleData={roleData} setRoleData={setRoleData} setViewHeight={setViewHeight} />
                 </View>
                 <TouchableOpacity 
-                style={[styles.role_add_button, {height: hp('6%'), marginTop: hp('2%'), display:(roleData.length>=7 ? 'none' : undefined)}]} onPress={handleRoleAdd}>
+                style={[styles.role_add_button, {height: hp('6%'), marginTop: hp('2%'), display:(roleData?.length>=7 ? 'none' : undefined)}]} onPress={handleRoleAdd}>
                     <Text>추가</Text>
                 </TouchableOpacity>
             </View>
@@ -487,7 +487,7 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
     const inputRefs2 = useRef([]);
     const handleNumberChange = (type, index, value) => {
         setRoleData((prevState) =>
-          prevState.map((v, i) => {
+          prevState?.map((v, i) => {
             if (i === index) {
               return {
                 ...v,
@@ -516,7 +516,7 @@ function RoleItem({roleData, setRoleData, setViewHeight}){
       };
     return (
         <>
-        {roleData.map((value, index) => {
+        {roleData?.map((value, index) => {
             if (index<1) {
                 return (
                     <View style={[styles.role_item, {height:hp('8%')}]} key={index}>
