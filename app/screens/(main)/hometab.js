@@ -35,7 +35,9 @@ export default function OnGoing({navigation, route}) {
                 // const result = error.response.data;
                 // console.log('Home Render Failed :', error);
             })
-            }catch(err){console.log(err)};
+            }catch(err){
+                console.log(err)
+            };
         } else {
             try{
             axios.get(`${API_URL}/api/board?${params.toString()}`)
@@ -149,7 +151,7 @@ export function Complete({navigation}){
                 setCompleteList(result.data);
             })
             .catch(error => {
-                console.log(error);
+                // console.log(error);
                 // const result = error.response.data;
                 // console.log('Home Render Failed :', error);
             })

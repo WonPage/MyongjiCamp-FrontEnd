@@ -398,7 +398,7 @@ export function Step3Screen({route, navigation}) {
         })
         .catch(error => {
             const result = error.response.data;
-            // console.log('너 틀림', result);
+            console.log('너 틀림', result);
             return navigation.navigate('ModalLayout', {component:'MyAlert', title:'경고', message: result.data});
             // return Alert.alert('경고', result.data);
         })
