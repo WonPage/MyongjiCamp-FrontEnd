@@ -15,7 +15,7 @@ export default function SearchResult({navigation, route}){
 
     // axios.get으로 query를 담아서 보냄. 
     const searching = () => {
-        const params = new URLSearchParams();
+        // const params = new URLSearchParams();
         const query = {
             'keyword' : keyword,
             'roles' : roles.map((tag)=>{
@@ -34,16 +34,18 @@ export default function SearchResult({navigation, route}){
             'boardType':boardType,
             'status': (boardType === 'recruit' ? 'ongoing' : undefined)
         }
-        params.append('keyword', query.keyword);
+/*         params.append('keyword', query.keyword);
         params.append('roles', query.roles.join(','));
         params.append('pageNum', query.pageNum);
         params.append('direction', query.direction);
         params.append('boardType', query.boardType);
-        params.append('status', query.status);
-
-        console.log(params.toString());
-        axios.get(`${API_URL}/api/board?${params.toString()}`)
-        // axios.get(`http://192.168.89.73:8080/api/board?${params.toString()}`)
+        params.append('status', query.status); */
+        let arr = ""
+        Object.keys(query).map((key)=>{
+            arr += key+'='+query[key]+'&';
+        })
+        // axios.get(`${API_URL}/api/board?${params.toString()}`)
+        axios.get(`${API_URL}/api/board?${arr}`)
         .then(res => {
             const result = res.data;
             // console.log('옴', result.data);

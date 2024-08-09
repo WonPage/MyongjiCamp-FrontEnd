@@ -1,7 +1,6 @@
 {
   "expo": {
     "name": "MyongjiCamp",
-    "slug": "MyongjiCamp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -37,9 +36,6 @@
     "extra": {
       "router": {
         "origin": false
-      },
-      "eas": {
-        "projectId": "16fe94b5-8ab1-4590-8cec-f5c682704518"
       }
     }
   }

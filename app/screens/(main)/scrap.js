@@ -21,6 +21,7 @@ export default function Scrap({navigation, route}) {
         headers: {Authorization: `Bearer ${token.token}`}
       })
       .then(res => {
+        console.log(res.data.data);
         const result = res.data.data;
         const scrapList = result.filter(item=>item.recruitStatus===statusMode);
         setScrapList(scrapList);
